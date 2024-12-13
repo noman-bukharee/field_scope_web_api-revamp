@@ -765,123 +765,52 @@ class UserController extends Controller
     }
     // Remeber Me Functinality Implementation
     
-    // public function login(Request $request)
-    // {
-    //     Log::info('login payload', $request->all());
-
-    //     // Define validation rules
-    //     $param_rules['email'] = 'required|string|email|max:150';
-    //     $param_rules['password'] = 'required|string|min:6';
-
-    //     $this->__is_redirect = true;
-    //     $this->__view = 'admin/login';
-
-    //     // Validate request
-    //     $response = $this->__validateRequestParams($request->all(), $param_rules);
-
-    //     if ($this->__is_error == true) {
-    //         return $response;
-    //     }
-
-    //     // Perform login by verifying email and encrypted password
-    //     $user = User::login($request->email, $this->__encryptedPassword($request->password));
-
-    //     if ($user->isEmpty()) {
-    //         return $this->__sendError(Lang::get('auth.failed'), [], 400);
-    //     }
-
-    //     // Set user session if not API call
-    //     if ($this->call_mode != 'api') {
-    //         $this->__setSession('user', $user[0], '');
-    //     }
-
-    //     // Update user model with device details
-    //     $userModel = User::where(['id' => $user[0]->id])->first();
-    //     $userModel->device_type = $request->device_type;
-    //     $userModel->device_token = $request->device_token;
-
-    //     // Handle "Remember Me" functionality
-    //     if (!empty($request['remember_me'])) {
-    //         // Create a unique remember token
-    //         $rememberToken = bcrypt($request->email);
-    //         \Log::debug('remember_me: ' . $rememberToken);
-
-    //         // Queue the remember_me cookie with a 30-day expiration time (in minutes)
-    //         Cookie::queue('remember_me', $rememberToken, 43200); // 43200 minutes = 30 days
-    //         Cookie::queue('email', $request->email, 43200); // Store email
-    //         Cookie::queue('password', $request->password, 43200); // Store password
-
-    //         // Save the token in the user's model
-    //         $userModel->remember_token = $rememberToken;
-    //     } else {
-    //         // If "Remember Me" is not checked, remove cookies
-    //         Cookie::queue(Cookie::forget('remember_me'));
-    //         Cookie::queue(Cookie::forget('email'));
-    //         Cookie::queue(Cookie::forget('password'));
-    //     }
-
-    //     // Save user model
-    //     $userModel->save();
-
-    //     $this->__is_paginate = false;
-    //     $this->__is_collection = false;
-    //     $this->__view = 'admin/user_type';
-
-    //     // Return success response
-    //     return $this->__sendResponse('Auth', $user[0], 200, 'User has been logged in successfully.');
-    // }
     public function login(Request $request)
     {
         Log::info('login payload', $request->all());
-    
+
         // Define validation rules
         $param_rules['email'] = 'required|string|email|max:150';
         $param_rules['password'] = 'required|string|min:6';
-    
+
         $this->__is_redirect = true;
-    
+        $this->__view = 'admin/login';
+
         // Validate request
         $response = $this->__validateRequestParams($request->all(), $param_rules);
-    
+
         if ($this->__is_error == true) {
             return $response;
         }
-    
+
         // Perform login by verifying email and encrypted password
         $user = User::login($request->email, $this->__encryptedPassword($request->password));
-        $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
-            ->where('user.id', $user[0]->id)
-            ->where('cg.id', $user[0]->company_group_id)
-            ->first();
+
         if ($user->isEmpty()) {
             return $this->__sendError(Lang::get('auth.failed'), [], 400);
         }
-    
+
         // Set user session if not API call
         if ($this->call_mode != 'api') {
-            $this->__setSession('user', $user[0], 'role', $userInsector[0]);
+            $this->__setSession('user', $user[0], '');
         }
-    
+
         // Update user model with device details
         $userModel = User::where(['id' => $user[0]->id])->first();
         $userModel->device_type = $request->device_type;
         $userModel->device_token = $request->device_token;
-        
-        //Get User by Role
-        // $userRole = $userModel->role()->first();
-        $roleName = strtolower($userModel->user_group_id);
 
         // Handle "Remember Me" functionality
         if (!empty($request['remember_me'])) {
             // Create a unique remember token
             $rememberToken = bcrypt($request->email);
             \Log::debug('remember_me: ' . $rememberToken);
-    
+
             // Queue the remember_me cookie with a 30-day expiration time (in minutes)
             Cookie::queue('remember_me', $rememberToken, 43200); // 43200 minutes = 30 days
             Cookie::queue('email', $request->email, 43200); // Store email
             Cookie::queue('password', $request->password, 43200); // Store password
-    
+
             // Save the token in the user's model
             $userModel->remember_token = $rememberToken;
         } else {
@@ -890,15 +819,18 @@ class UserController extends Controller
             Cookie::queue(Cookie::forget('email'));
             Cookie::queue(Cookie::forget('password'));
         }
-    
+
         // Save user model
         $userModel->save();
-    
+
         $this->__is_paginate = false;
         $this->__is_collection = false;
-        
-        // \Log::info('userROLES', $roleName);
-        \Log::debug(strtolower($roleName) . ' ' . $roleName);
+        // $this->__view = 'admin/user_type';
+             // \Log::info('userROLES', $roleName);
+        //Get User by Role
+        // $userRole = $userModel->role()->first();
+        $roleName = strtolower($userModel->user_group_id);
+        // \Log::debug(strtolower($roleName) . ' ' . $roleName);
         // Redirect based on user role
         //roleName = 1 is Company Owner
         if ($roleName == 1) {
@@ -908,9 +840,92 @@ class UserController extends Controller
         else if($roleName == 2){
             $this->__view = 'admin/photo_feed';
         }
+
         // Return success response
         return $this->__sendResponse('Auth', $user[0], 200, 'User has been logged in successfully.');
     }
+    // public function login(Request $request)
+    // {
+    //     Log::info('login payload', $request->all());
+    
+    //     // Define validation rules
+    //     $param_rules['email'] = 'required|string|email|max:150';
+    //     $param_rules['password'] = 'required|string|min:6';
+    
+    //     $this->__is_redirect = true;
+    
+    //     // Validate request
+    //     $response = $this->__validateRequestParams($request->all(), $param_rules);
+    
+    //     if ($this->__is_error == true) {
+    //         return $response;
+    //     }
+    
+    //     // Perform login by verifying email and encrypted password
+    //     $user = User::login($request->email, $this->__encryptedPassword($request->password));
+    //     $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+    //         ->where('user.id', $user[0]->id)
+    //         ->where('cg.id', $user[0]->company_group_id)
+    //         ->first();
+    //     if ($user->isEmpty()) {
+    //         return $this->__sendError(Lang::get('auth.failed'), [], 400);
+    //     }
+    
+    //     // Set user session if not API call
+    //     if ($this->call_mode != 'api') {
+    //         $this->__setSession('user', $user[0], 'role', $userInsector[0]);
+    //     }
+    
+    //     // Update user model with device details
+    //     $userModel = User::where(['id' => $user[0]->id])->first();
+    //     $userModel->device_type = $request->device_type;
+    //     $userModel->device_token = $request->device_token;
+        
+    
+
+    //     // Handle "Remember Me" functionality
+    //     if (!empty($request['remember_me'])) {
+    //         // Create a unique remember token
+    //         $rememberToken = bcrypt($request->email);
+    //         \Log::debug('remember_me: ' . $rememberToken);
+    
+    //         // Queue the remember_me cookie with a 30-day expiration time (in minutes)
+    //         Cookie::queue('remember_me', $rememberToken, 43200); // 43200 minutes = 30 days
+    //         Cookie::queue('email', $request->email, 43200); // Store email
+    //         Cookie::queue('password', $request->password, 43200); // Store password
+    
+    //         // Save the token in the user's model
+    //         $userModel->remember_token = $rememberToken;
+    //     } else {
+    //         // If "Remember Me" is not checked, remove cookies
+    //         Cookie::queue(Cookie::forget('remember_me'));
+    //         Cookie::queue(Cookie::forget('email'));
+    //         Cookie::queue(Cookie::forget('password'));
+    //     }
+    
+    //     // Save user model
+    //     $userModel->save();
+    
+    //     $this->__is_paginate = false;
+    //     $this->__is_collection = false;
+        
+    //     // \Log::info('userROLES', $roleName);
+    //     //Get User by Role
+    //     // $userRole = $userModel->role()->first();
+    //     $roleName = strtolower($userModel->user_group_id);
+    //     \Log::debug(strtolower($roleName) . ' ' . $roleName);
+    //     // Redirect based on user role
+    //     //roleName = 1 is Company Owner
+    //     if ($roleName == 1) {
+    //         $this->__view = 'admin/user_type';
+    //     } 
+    //     //roleName = 2 is Company Agents
+    //     else if($roleName == 2){
+    //         $this->__view = 'admin/photo_feed';
+    //     }
+    //     // Return success response
+    //     return $this->__sendResponse('Auth', $user[0], 200, 'User has been logged in successfully.');
+    // }
 
     public function changeCompanyPassword(Request $request)
     {

@@ -108,7 +108,7 @@ Route::group(['middleware' => ['login.auth','admin.auth'], 'prefix'=>'admin','as
         
         Route::group(['middleware' => ['check.role:admin']], function () {
             Route::any('/', 'CompanyGroupController@index')->middleware('check.role:admin')->name('user_type');;
-            Route::get('', 'CompanyGroupController@companyGroupDatatable')->middleware('check.role:admin')->name('user_type');;
+            Route::get('', 'CompanyGroupController@companyGroupDatatable')->middleware('check.role:admin')->name('user_type');
             
             Route::get('user_type', 'CompanyGroupController@companyGroupDatatable')->name('user_type');
             Route::post('user_type/store', 'CompanyGroupController@store');
