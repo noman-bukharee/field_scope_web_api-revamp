@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Config;
-use App\Models\Role;
+// use App\Models\Role;
 
 class User extends Model
 {
@@ -755,9 +755,9 @@ class User extends Model
     {
         return $this->belongsTo('App\Models\CompanyGroup', 'company_group_id', 'id')->selectRaw('id,title,created_at');
     }
-    public function role()
-    {
-        return $this->belongsTo(Role::class);  // Assuming the foreign key is 'role_id'
-    }
+    // public function role()
+    // {
+    //     return $this->belongsTo(Role::class);  // Assuming the foreign key is 'role_id'
+    // }
 
 }
