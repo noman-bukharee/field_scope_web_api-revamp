@@ -105,7 +105,7 @@ class HomeController extends Controller
 
         $request['plan'] = Subscription::where(['type' => 'free' , 'key' => '14day_free' ])->first();
 
-        $request['role_id'] = 3;
+        $request['role_id'] = 1;
 
         $result = User::createCompany($request->all());
 

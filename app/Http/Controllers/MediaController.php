@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Models\CompanyGroupCategory;
 
 class MediaController extends Controller
 {
@@ -180,9 +181,24 @@ class MediaController extends Controller
         return $this->__sendResponse('User', $data, 200, 'User list retrieved successfully.');
     }
 
+    //Edit Photofeed Photo
     public function editPhoto(Request $request, $id){
         // $data['stickers'] = Sticker::all();
         $this->__view = 'admin/photo_feed_edit';
+        $data['pMedia'] = ProjectMedia::getById($id,['tags_data','category']);
+        //
+        $projectid = ProjectMedia::where('id',$id)->pluck('project_id')->toArray();
+        $data['project'] = Project::getById($projectid);
+        
+        $this->__is_paginate = false;
+        $this->__collection = false;
+        return $this->__sendResponse('User', $data  , 200, 'User list retrieved successfully.');
+    }
+
+    //Edit Project Photo Details
+    public function project_photo_edit(Request $request, $id){
+        // $data['stickers'] = Sticker::all();
+        $this->__view = 'admin/project_photo_details_edit';
         $data['pMedia'] = ProjectMedia::getById($id,['tags_data','category']);
         //
         $projectid = ProjectMedia::where('id',$id)->pluck('project_id')->toArray();
@@ -279,6 +295,35 @@ class MediaController extends Controller
         $media['project'] = Project::getById($projectid);
         $media['area'] = Category::where('id', $media['category']['parent_id'])->first();
 //        die('valdiation good: '.$id);
+
+        $media['tags_list'] = collect($media['tags_data'])->implode('name', ', ');
+        
+
+        $this->__is_paginate = false;
+        $this->__collection = false;
+        return $this->__sendResponse('User', $media, 200, 'Photo Details retrieved successfully.');
+    }
+    //GET PROJECT PHOTO DETAILS
+    public function project_photo_details(Request $request,$id)
+    {
+        $this->__view = 'admin/project_photo_details';
+        $request['id'] = $id ;
+        //<editor-fold desc="Validation">
+        $param_rules['id'] = [
+            'required',
+            'int',
+            Rule::exists('project_media', 'id')->whereNull('deleted_at')
+        ];
+        $response = $this->__validateRequestParams($request->all(), $param_rules);
+        if ($this->__is_error)
+            return $response;
+        //</editor-fold>
+
+        $projectid = ProjectMedia::where('id',$id)->pluck('project_id')->toArray();
+        $media = ProjectMedia::getById($id,['tags_data','category']);
+        $media['project'] = Project::getById($projectid);
+        $media['area'] = Category::where('id', $media['category']['parent_id'])->first();
+        //        die('valdiation good: '.$id);
 
         $media['tags_list'] = collect($media['tags_data'])->implode('name', ', ');
         

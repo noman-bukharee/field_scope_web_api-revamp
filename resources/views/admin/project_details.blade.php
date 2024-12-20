@@ -93,9 +93,20 @@
               </div>
                 </div>
             </div>
+            <h1 class="heading">Photo Size</h1>
+            <div class="action-btns">
+                <div class="gallery-view-selector">
+                    <button class="view-btn active" data-size="small">Small</button>
+                    <button class="view-btn" data-size="medium">Medium</button>
+                    <button class="view-btn" data-size="thumbnail">Thumbnail</button>
+                </div>
+                <div class="download-btns">
+                    <button id="download-selected" class="download-btn">Download Photo</button>
+                </div>
+            </div>
             <!-- Photos -->
-            <div class="photo-sec row">
-                <div class="col-12">
+            <div id="gallery"  class="gallery small photo-sec row">
+                <div class="col-12 photo">
                     <div class="row">
                         <!-- Required Photos -->
                         <div class="req-photo col-12">
@@ -124,14 +135,16 @@
                                                             $day = date("l", strtotime($requiredDate));
                                                             $overall = date("l, F jS, Y", strtotime($requiredDate));
                                                         @endphp
-                                                            <div class=" d-flex flex-column gap-2">                                         
-                                                                <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($rCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}">
+                                                            <div class="small d-flex flex-column gap-2">                                       
+                                                                    <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($rCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> -->
+                                                                <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$rCatMediaItem['id']}}">
+                                                                    <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($rCatMediaItem['image_path'])}}">
                                                                     <img src="{{URL::to($rCatMediaItem['image_path'])}}" alt="inspection photos" >
-                                                               </a> 
-                                                               <div class=" d-flex flex-row gap-2 justify-space">
-                                                                    <p>{{$time}} </p>
-                                                                    <p>{{$inspectorName}} </p>
-                                                               </div>
+                                                                </a> 
+                                                                <div class=" d-flex flex-row gap-2 justify-space">
+                                                                        <p>{{$time}} </p>
+                                                                        <p>{{$inspectorName}} </p>
+                                                                </div>
                                                             </div>
                                                         @endforeach
                                                 </div>
@@ -171,7 +184,9 @@
                                                                 $overall = date("l, F jS, Y", strtotime($inspectionDate));
                                                             @endphp
                                                             <div class="d-flex flex-column gap-2">
-                                                                <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($subCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}">
+                                                                <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($subCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> -->
+                                                                <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$subCatMediaItem['id']}}">
+                                                                    <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($subCatMediaItem['image_path'])}}">
                                                                     <img src="{{URL::to($subCatMediaItem['image_path'])}}" alt="inspection photos">
                                                                 </a>
                                                                 <div class=" d-flex flex-row gap-2  justify-space">
@@ -215,7 +230,9 @@
                                                                 $overall = date("l, F jS, Y", strtotime($additionalPhotoDate));
                                                             @endphp
                                                             <div class="d-flex flex-column gap-2">
-                                                                <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($subCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> 
+                                                                <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($subCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}">  -->
+                                                                <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$rCatMediaItem['id']}}">
+                                                                    <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($rCatMediaItem['image_path'])}}">
                                                                     <img src="{{URL::to($rCatMediaItem['image_path'])}}" alt="inspection photos">
                                                                 </a>
                                                                 <div class=" d-flex flex-row gap-2  justify-space">
@@ -460,12 +477,131 @@
         .download-button:hover {
             background-color: #3e8e41;
         }
+        /* .mfp-zoom-out-cur */
+        /* .gallery {
+    display: grid;
+    gap: 15px;
+} */
+        .gallery.small .photo img {
+            width: 150px;
+            height: 150px;
+            transition: .1s ease-in;
+        }
+        .gallery.medium .photo img {
+            width: 350px;
+            height: 350px;
+            transition: .1s ease-in;
+        }
+        .gallery.thumbnail .photo img {
+            width: 300px;
+            height: 300px;
+            transition: .1s ease-in;
+        }
+        .gallery-view-selector {
+            padding: 2rem 0rem;
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+        }
+
+        .gallery-view-selector button {
+            background: #1282f2;
+            color: #fff !important;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        .gallery-view-selector button:hover {
+            background: #000;
+            transition: .3s ease-in;
+            color: #fff;
+        }
+        .gallery-view-selector button.active {
+            background: #000;
+            transition: .3s ease-in;
+            color: #fff;
+        }
+        button#download-selected {
+            background: #1282f2;
+            color: #fff !important;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button#download-selected:hover {
+            background: #000;
+            transition: .3s ease-in;
+            color: #fff;
+        }
+
+        .checked-photos {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        input.select-photo {
+            width: 1.5em;
+            height: 1.5em;
+        }
+        .action-btns {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .download-btns {
+            padding: 1rem 0rem;
+        }
+        input.select-photo:hover,input.select-photo:focus {
+            cursor: pointer;
+        }
+        h1.heading {
+            padding-top: 24px;
+            font-family: "EuclidSquare-Medium" !important;
+            font-size: 24px;
+        }
     </style>
 @endpush
 @push("page_js")
 <script src="{{asset('assets/js/moment.min.js')}}" ></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js'></script>
 <script>
+    // Handle gallery view switching and active button styling
+    document.querySelectorAll('.view-btn').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            // Remove 'active' class from all buttons
+            document.querySelectorAll('.view-btn').forEach((btn) => btn.classList.remove('active'));
+
+            // Add 'active' class to the clicked button
+            event.target.classList.add('active');
+
+            // Change gallery view size
+            const size = event.target.getAttribute('data-size');
+            document.getElementById('gallery').className = `gallery ${size} photo-sec row`;
+        });
+    });
+    // Handle download of selected images
+    document.getElementById('download-selected').addEventListener('click', () => {
+        const selectedImages = document.querySelectorAll('.select-photo:checked');
+        if (selectedImages.length === 0) {
+            alert('No images selected!');
+            return;
+        }
+
+        selectedImages.forEach((checkbox) => {
+            const downloadUrl = checkbox.getAttribute('data-download');
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = downloadUrl.split('/').pop(); // Use the filename for download
+            link.click();
+            checkbox.checked = false;
+        });
+    });
     $(document).ready(function(){
         $('.image-popup-vertical-fit').magnificPopup({
             type: 'image',

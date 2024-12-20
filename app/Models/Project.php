@@ -206,7 +206,7 @@ class Project extends Model
         parse_str($params['custom_search'], $output);
 
         $query = self::with(['getSingleMedia'])->leftJoin('user AS u', 'u.id', '=','project.assigned_user_id')
-            ->where(['project.company_id' => $params['company_id']])->orderBy('id','DESC');;
+            ->where(['project.company_id' => $params['company_id']])->orderBy('id','DESC'); 
 
         $mediaPath = url(Config::get('constants.USER_IMAGE_PATH'));
         $placeHolder = url('image/default_user.png');

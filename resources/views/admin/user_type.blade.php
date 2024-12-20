@@ -43,20 +43,24 @@
                 >
                     <thead>
                     <tr>
-                        <th>User Type</th>
+                        <th>Title</th>
                         <th>Assigned Users</th>
+                        <th>User Type</th>
                         <th id="action">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     @if(count($records ))
                         @foreach ($records['data'] AS $item)
+                        
                     <tr id="row-{{$item['id']}}">
                         <td>{{$item['title']}}</td>
                         <td>
                             {{$item['users']}}
                         </td>
-
+                        <td>
+                            {{$item['role_name']}}
+                        </td>
                         <td>
                             <div class="dropdown">
                                 <button
@@ -122,6 +126,14 @@
                             <!-- <label>User Type Name</label> -->
                             <input type="text" name="user_type"  placeholder="User Type Name" class="form-control place-color" aria-describedby="emailHelp" maxlength="30"  autocomplete="off"/>
                         </div>
+                        <div class="col-md-12 companyinfobody rm-companyinfobody-select-modified">
+                            <!-- <label>User Type</label> -->
+                            <select name="role_id" id="sel1" class="form-select add-select">
+                                <option value="">Select Role</option>
+                                <option value="2">Manager</option>
+                                <option value="3">Standard</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -150,7 +162,19 @@
                     <div class="row">
                         <div class="form-group new-input-modal">
                         <!-- <label>User Type Name</label> -->
-                    <input type="text" name="user_type" placeholder="User Type Name" class="form-control place-color" aria-describedby="emailHelp"  autocomplete="off"/>
+                            <input type="text" name="user_type" placeholder="User Type Name" class="form-control place-color" aria-describedby="emailHelp"  autocomplete="off"/>
+                        </div>
+                        <div class="col-md-12 companyinfobody rm-companyinfobody-select-modified">
+                            <!-- <label>User Type</label> -->
+                            <!-- <select name="user_type_role" id="sel1" class="form-select add-select">
+                                <option value="">Select Role</option>
+                                <option value="manager">Manager</option>
+                                <option value="standard">Standard</option>
+                            </select> -->
+                            <select name="user_type_role" class="form-select add-select">
+                                <option value="">Select Role</option>
+                                
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -218,9 +242,29 @@
                 data: '',
                 success: function (response) {
                     var data = response.data ;
+                    console.log(response.data)
+                    $('#update_form').attr('action',updateUrl+'/'+response.data.company_group.id);
+                    $('#update_form input[name="user_type"]').val(response.data.company_group.title);
+                    // $('#update_form select[name="user_type_role"]').val(response.data.user_type);
+                    // Populate the assigned user select dropdown
+                    // Populate the assigned user select dropdown
+                    // Populate the assigned user select dropdown
+                    $('#update_form select[name="user_type_role"]').empty(); // Clear the previous options
+                    
+                    // Filter roles to exclude the "Admin" role
+                    var filteredRoles = response.data.roles.filter(function(role) {
+                        return role.name !== "Admin"; // Exclude roles with the name "Admin"
+                    });
 
-                    $('#update_form').attr('action',updateUrl+'/'+response.data.id);
-                    $('#update_form input[name="user_type"]').val(response.data.title);
+                    // Loop through filtered roles and append them to the select dropdown
+                    filteredRoles.forEach(function(role) {
+                        var option = new Option(role.name, role.id); // Create new option element
+                        $('#update_form select[name="user_type_role"]').append(option);
+                    });
+
+                    // Preselect the role that is assigned
+                    $('#update_form select[name="user_type_role"]').val(response.data.company_group.role_id); 
+
                     $editModal.modal('show');
                 },
                 error: function () {

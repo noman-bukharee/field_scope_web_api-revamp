@@ -11,11 +11,13 @@
                     </div>
                     <div>
                         <ul class="header-menu d-flex align-items-center">
+                            @if($roleName == 'admin')
                             <li>
                                 <a href="{{ URL::to('admin/settings') }}">
                                     <img src="{{asset("assets/img/setting.png")}}" alt="" />
                                 </a>
                             </li>
+                            @endif
                             <li class="icon-button">
                                
                                 <div class="dropdown noti-drop">

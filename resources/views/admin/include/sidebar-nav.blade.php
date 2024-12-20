@@ -1,30 +1,6 @@
-@php
-use App\Models\User;
-    
-
-    $userGroupId = $user->user_group_id;
-    if ($userGroupId == 1) {
-        $roleName = 'admin';
-    } 
-    elseif($userGroupId == 2){
-
-        //Get Agent role Title
-        $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
-            ->where('user.id', session('user')->id)
-            ->where('cg.id', $user->company_group_id)
-            ->first();
-        if($userInsector->title == 'manager'){
-            $roleName = 'manager';
-        }
-        else{
-            $roleName = 'standard';
-        }
-    }
-   
-@endphp
 
 <aside class="flex-shrink-0 p-3" id="sidebar">
-    {{session('role')}}
+    
         <header class="sidebar-heading">
             <div class="side-logo">
                 <a href="{{ URL::to('admin/user_type') }}">

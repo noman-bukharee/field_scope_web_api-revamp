@@ -712,6 +712,44 @@ class ProjectController extends Controller
         $params['user_group_id'] = 2;
         $params['type'] = 1;
         $params['keyword'] = $request['keyword'];
+        //Get Projects by role Start
+
+        // Retrieve the user
+        $user = User::where('id', session('user')->id)->first();
+        // $userInspectors = User::inspectorDatatable($params);
+        
+        
+        // Get the user's user group ID
+        $userGroupId = $user->user_group_id;
+        // Check if the user is an admin
+        if ($userGroupId == 1) {
+            $roleName = 'admin';
+            $params['assigned_user_id'] = 'project.user_id';
+        } 
+        // Check if the user is an agent
+        elseif ($userGroupId == 2) {
+            $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+            ->where('user.id', session('user')->id)
+            ->where('cg.id', $user->company_group_id)
+            ->first();
+            
+            $userType = $userInsector->role_id;
+
+            // \Log::info('userInsector' . $userType);
+            // \Log::info('userInsector' . $userInsector);
+            // $userType = $user->user_type;
+            
+            // Check if the user is a manager
+            if ($userType == 2) {
+                // $roleName = 'manager';
+                $params['assigned_user_id'] = 'project.user_id';
+            } else if($userType == 3){
+                $roleName = 'standard';
+                $params['assigned_user_id'] = 'project.assigned_user_id';
+            }
+        }
+
+        //Get Projects by role End
 
         $dataTableRecord = Project::getCompanyProjectsGrid($params);
         $userWhere = [
@@ -742,6 +780,8 @@ class ProjectController extends Controller
         $params['user_group_id'] = 2;
         $params['type'] = 1;
         $params['keyword'] = $request['keyword'];
+
+        
 
         $dataTableRecord = Project::getCompanyProjectsDatatable_withUsers($params);
 //        p($dataTableRecord['records'],'$dataTableRecord');

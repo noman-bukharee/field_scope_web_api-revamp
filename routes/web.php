@@ -92,10 +92,10 @@ Route::group(['middleware' => ['login.auth','admin.auth'], 'prefix'=>'admin','as
 
     Route::get('logout', 'UserController@logout');
     // Only admin can access subscription management
-    Route::group(['middleware' => ['check.role:admin']], function () {
+    // Route::group(['middleware' => ['check.role:admin']], function () {
         Route::get('re_subscription', 'SubscriptionController@reSubscriptionView');
         Route::post('re_subscription', 'SubscriptionController@reSubscription');
-    });
+    // });
     
     Route::group(['middleware' => ['subscription.auth']], function() {
         
@@ -230,6 +230,8 @@ Route::group(['middleware' => ['login.auth','admin.auth'], 'prefix'=>'admin','as
             Route::get('project/editProjectDetails/{id}', 'ProjectController@editProjectDetails');
             Route::post('project/update/{id}', 'ProjectController@updateProject');
             Route::get('project/edit-project/{id}', 'ProjectController@detailView');
+            Route::get('project/photo/details/{id}', 'MediaController@project_photo_details');
+            Route::get('project/photo/edit/{id}', 'MediaController@project_photo_edit');
 
             /************ PROJECT ROUTES LOGIC END ***************/
 

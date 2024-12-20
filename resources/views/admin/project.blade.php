@@ -1,6 +1,37 @@
 @extends('admin.master')
 @section('content')
 @section('title', 'Projects')
+<?php
+// echo "<pre>";
+$session = \Session::all();
+$user = $session['user'];
+// print_r($session['user']); die;
+
+?>
+@php
+use App\Models\User;
+    
+
+    $userGroupId = $user->user_group_id;
+    if ($userGroupId == 1) {
+        $roleName = 'admin';
+    } 
+    elseif($userGroupId == 2){
+
+        //Get Agent role Title
+        $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+            ->where('user.id', session('user')->id)
+            ->where('cg.id', $user->company_group_id)
+            ->first();
+        if($userInsector->role_id == 2){
+            $roleName = 'manager';
+        }
+        else{
+            $roleName = 'standard';
+        }
+    }
+   
+@endphp
 <section class="container-fluid main-sec">
     <div class="row">
         <div class="col-12 mt-5">
@@ -29,9 +60,11 @@
                     <div class="me-3">
                         <button class="btn-theme2"  data-bs-toggle="modal" data-bs-target="#myModalFilter">Filters</button>
                     </div>
+                    @if($roleName == 'admin' || $roleName == 'manager')
                     <div >
                         <button class="btn-theme" type="button"  data-bs-toggle="modal" data-bs-target="#myModal">+ Add New</button>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>

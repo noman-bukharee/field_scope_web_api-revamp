@@ -31,16 +31,16 @@ class CheckRole
             ->where('cg.id', $user->company_group_id)
             ->first();
             
-            $userType = $userInsector->title;
+            $userType = $userInsector->role_id;
 
             \Log::info('userInsector' . $userType);
             // \Log::info('userInsector' . $userInsector);
             // $userType = $user->user_type;
             
             // Check if the user is a manager
-            if ($userType == 'manager' || $userType == 'Manager') {
+            if ($userType == 2) {
                 $roleName = 'manager';
-            } else {
+            } else if($userType == 3){
                 $roleName = 'standard';
             }
         } else {
@@ -50,7 +50,9 @@ class CheckRole
                 'message' => __("You do not have permission to access this"),
                 'data' => [],
             ];
-            return response()->json($response, $code);
+            // return response()->json($response, $code);
+            // $request->session()->flush();
+            return redirect('admin/login');
         }
         // Get the role name of the user
         // $userRole = $user->role()->first();

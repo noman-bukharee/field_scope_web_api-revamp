@@ -14,6 +14,7 @@ use App\Models\Setting;
 use App\Models\Subscription;
 use App\Models\Transactions;
 use App\Models\User;
+use App\Models\Role;
 use App\Models\UserSubscription;
 use App\Models\UserWishlist;
 use Carbon\Carbon;
@@ -82,6 +83,8 @@ class CompanyGroupController extends Controller
 
         //Redirect User based on roles Start
         $user = User::where('id', $request['user_id'])->first();
+        // $user_roles = Role::where('id', $request['user_id'])->first();
+
         
         $roleName = strtolower($user->user_group_id);
         \Log::info('roleName:'.$roleName);
@@ -118,6 +121,8 @@ class CompanyGroupController extends Controller
                 $records["data"][] = [
                     'id' => $record->id,
                     'title' => $record->title,
+                    'role_id' => $record->role_id,
+                    'role_name' => $record->role->name ?? 'N/A', // Add the role name here
                     'users' => $names->implode(', ')
                 ];
 
@@ -143,6 +148,9 @@ class CompanyGroupController extends Controller
 
         //<editor-fold desc="Validation">
         $param_rules['user_type'] = 'required|string|max:100' ;
+        // $param_rules['user_type_role'] = 'required|in:standard,manager'; // Validate user_type for ENUM values
+        $param_rules['role_id'] = 'required|integer|min:1';
+
         $response = $this->__validateRequestParams($request->all(), $param_rules);
         if($this->__is_error == true){
             $error = \Session::get('error');
@@ -153,6 +161,7 @@ class CompanyGroupController extends Controller
 
         $companyGroup = new CompanyGroup();
         $companyGroup->title = $request->user_type;
+        $companyGroup->role_id = $request->role_id; // Save user_type
         $companyGroup->company_id = $request->company_id;
 
         if(!$companyGroup->save()){
@@ -196,20 +205,40 @@ class CompanyGroupController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request,$id)
+    // public function edit(Request $request,$id)
+    // {
+    //     $list = CompanyGroup::getById($id);
+
+    //     $this->__is_paginate = false;
+    //     $this->__is_ajax = true;
+    //     $this->__is_collection = false;
+    //     return $this->__sendResponse('CompanyGroup', $list, 200,'Company Group list retrieved successfully.');
+    // }
+    public function edit(Request $request, $id)
     {
+        // Fetch the CompanyGroup by its ID
         $list = CompanyGroup::getById($id);
+
+        // Fetch all roles to be included in the response
+        $roles = Role::all();  // Assuming Role model exists
 
         $this->__is_paginate = false;
         $this->__is_ajax = true;
         $this->__is_collection = false;
-        return $this->__sendResponse('CompanyGroup', $list, 200,'Company Group list retrieved successfully.');
+
+        // Returning the company group data along with roles
+        return $this->__sendResponse('CompanyGroup', [
+            'company_group' => $list,
+            'roles' => $roles,
+        ], 200, 'Company Group and roles retrieved successfully.');
     }
 
     public function update(Request $request, $id)
     {
         $request['id'] = $id;
         $param_rules['user_type'] = 'required|string' ;
+        // $param_rules['user_type_role'] = 'required|string' ;
+        $param_rules['user_type_role'] = 'required|integer|min:1';
         $param_rules['id'] = 'required|int|' ;
 
         $response = $this->__validateRequestParams($request->all(), $param_rules);
@@ -219,6 +248,7 @@ class CompanyGroupController extends Controller
 
         $companyGroup = CompanyGroup::find($id);
         $companyGroup->title = $request->user_type;
+        $companyGroup->role_id = $request->user_type_role; // Save user_type
 
         if($this->call_mode == 'admin'){
             $this->__view = 'admin/user_type?page='.$request['page'];

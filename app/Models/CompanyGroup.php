@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Config;
+use App\Models\Role;
 
 class CompanyGroup extends Model
 {
@@ -77,8 +78,9 @@ class CompanyGroup extends Model
         parse_str($params['custom_search'], $output);
 
         // Initialize query
-        $query = self::selectRaw('company_group.*')->with(['assigned_user']);
+        $query = self::selectRaw('company_group.*')->with(['assigned_user', 'role']);
         $query->where('company_id', $params['company_id']);
+        
 
         // Keyword search
         if (!empty($output['keyword'])) {
@@ -119,5 +121,9 @@ class CompanyGroup extends Model
     public function categories(){
         return $this->belongsToMany('App\Models\Category','company_group_category','company_group_id','category_id')
             ;
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 }

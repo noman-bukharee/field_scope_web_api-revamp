@@ -1,6 +1,6 @@
 @extends('admin.master')
 @section('content')
-@section('title', 'Photo Feeds Detail')
+@section('title', 'Project Photo Feeds Edit')
 <pre>
 </pre>
 <section class="container-fluid main-sec">
@@ -61,7 +61,7 @@
                         <div class="photo-action-btn">
                             <!-- <a href="{{url('admin/photo_feed/edit/'.$data['id'])}}" class="btn btn-primary mr-2">Edit</a> -->
                             <input type="button" class="btn btn-primary mr-2" name="save" id="save" value="Done"/>
-                            <a href="{{url('admin/photo_feed')}}" class="btn btn-primary mr-2"> Cancel </a>
+                            <a href="{{url('admin/project/detail')}}/{{$data['pMedia']['project']['id']}}" class="btn btn-primary mr-2"> Cancel </a>
                         </div>
                     </form>
                 </div>
@@ -307,16 +307,7 @@
     
     const initEditor = async () => {
       editorInstance = await PhotoEditorSDK.PhotoEditorSDKUI.init({
-        filter: {
-    advancedUIToolControlBarOrder: [
-      {
-        type: 'expandable',
-        children: ['removeFilterButton', 'filterIntensitySlider', 'separator'],
-      },
-      'items',
-    ],
-    basicUIToolControlBarTabsOrder: ['filterIntensity'],
-  },
+       
         container: '#editor',
         // Please replace this with your license: https://img.ly/dashboard
         license: "",
@@ -327,7 +318,6 @@
         theme: 'light',
         defaultTool: 'library',
         scaleImageToFit: true,
-
         engine: {
             crossOrigin: 'anonymous',
             downscaleOptions: {
@@ -398,7 +388,7 @@ $('#save').on('click', async function (e) {
       $(this).prop('disabled', false); // Re-enable the save button
       if (data.code == 200) {
         // alert(data.message);
-        window.location.href = "{{URL::to('admin/photo_feed')}}";
+        window.location.href = "{{url('admin/project/detail')}}/{{$data['pMedia']['project']['id']}}";
       } else {
         alert("Update Failed");
       }
@@ -447,7 +437,7 @@ $('#update').on('click', async function (e) {
       $(this).prop('disabled', false); // Re-enable the save button
       if (data.code == 200) {
         // alert(data.message);
-        window.location.href = "{{url('admin/photo_feed/edit/'.$data['pMedia']['id'])}}";
+        window.location.href = "{{url('admin/project/photo/edit/'.$data['pMedia']['id'])}}";
       } else {
         alert("Update Failed");
       }
