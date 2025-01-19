@@ -60,6 +60,9 @@ use App\Models\User;
                     <div class="me-3">
                         <button class="btn-theme2"  data-bs-toggle="modal" data-bs-target="#myModalFilter">Filters</button>
                     </div>
+                    <div class="me-3">
+                        <button class="btn-theme2 clear-btn" id="clearFiltersBtn">Clear Filter</button>
+                    </div>
                     @if($roleName == 'admin' || $roleName == 'manager')
                     <div >
                         <button class="btn-theme" type="button"  data-bs-toggle="modal" data-bs-target="#myModal">+ Add New</button>
@@ -70,11 +73,13 @@ use App\Models\User;
         </div>
         <div class="col-12 mt-2">
             <div class="row" id="card-container">
+               
                 @foreach($data as $item)
                     @if(is_array($item))
                     
                         @foreach($item as $key => $value)
-                            @if(session('user')->user_group_id == 1 || (session('user')->user_group_id == 2 && $value['assigned_user_id'] == session('user')->company_group_id)) 
+                        
+                            @if(session('user')->user_group_id == 1 || $roleName == 'manager' ||(session('user')->user_group_id == 2 && $value['assigned_user_id'] == session('user')->company_group_id)) 
                             
                                 @php
                                     // Format inspection date to "day-month-year"
@@ -325,6 +330,11 @@ use App\Models\User;
         .edit-details .dropdown button {
             background: #ffffff !important;
         }
+        button.btn-theme2.clear-btn {
+            background: #fff;
+            color: #00000082;
+            border: 1px solid #00000029;
+        }
     </style>
 @endpush
 @push("page_js")
@@ -337,38 +347,75 @@ use App\Models\User;
 <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script> -->
 <script>
     // Search Filter
-    // $(document).ready(function() {
-    //     $('#filter').on('keyup', function() {
-    //         var searchValue = $(this).val().toLowerCase();
+    document.getElementById('clearFiltersBtn').addEventListener('click', function () {
+        // Reset the form fields
+        document.getElementById('projectSearchForm').reset();
 
-    //         $('.record-item').filter(function() {
-    //             // Check if the title matches the search value
-    //             $(this).toggle($(this).find('.title').text().toLowerCase().indexOf(searchValue) > -1);
-    //         });
-    //         // Recalculate pagination for filtered results
-    //         showPage(1);
-    //     });
-    // });
-    document.getElementById('projectSearchForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
+        // Optionally, reset any custom selection (like select2, if using it)
+        $('select').val('').trigger('change');
 
-        // Build the custom_search string
-        let searchParams = new URLSearchParams();
-
-        let createdDate = document.getElementById('filter_created_date').value;
-        let projectStatus = document.getElementById('filter_project_status').value;
-        let inspector = document.getElementById('filter_inspectors').value;
-        // let keyword = document.getElementById('keyword').value;
-
-        if (createdDate) searchParams.append('filter_created_date', createdDate);
-        if (projectStatus) searchParams.append('filter_project_status', projectStatus);
-        if (inspector) searchParams.append('filter_inspectors', inspector);
-        // if (keyword) searchParams.append('keyword', keyword);
-
-        // Append custom_search query parameter to the form action URL
-        let actionUrl = "{{ URL::to('admin/project') }}?custom_search=" + searchParams.toString();
-        window.location.href = actionUrl;
+        // Redirect to the same page without any filters
+        window.location.href = window.location.pathname;
     });
+    // Function to get a URL parameter by name
+    function getUrlParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // Function to initialize the form fields based on the URL parameters
+    function setFiltersFromUrl() {
+        const customSearch = getUrlParam('custom_search');
+        
+        if (customSearch) {
+            // Split the custom_search string into individual parameters
+            const filters = customSearch.split('&');
+
+            filters.forEach(function(filter) {
+                const [key, value] = filter.split('=');
+
+                // Set the form field value based on the key and value
+                if (key === 'filter_created_date') {
+                    document.querySelector('input[name="filter_created_date"]').value = decodeURIComponent(value);
+                } else if (key === 'filter_project_status') {
+                    document.querySelector('select[name="filter_project_status"]').value = decodeURIComponent(value);
+                } else if (key === 'filter_inspectors') {
+                    document.querySelector('select[name="filter_inspectors"]').value = decodeURIComponent(value);
+                }
+            });
+        }
+    }
+
+    // Initialize the form fields when the page loads
+    window.addEventListener('load', setFiltersFromUrl);
+  document.getElementById('projectSearchForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    var createdDate = document.querySelector('input[name="filter_created_date"]').value;
+    var projectStatus = document.querySelector('select[name="filter_project_status"]').value;
+    var inspector = document.querySelector('select[name="filter_inspectors"]').value;
+
+    // Build custom_search string
+    var customSearch = '';
+    if (createdDate) {
+        customSearch += 'filter_created_date=' + encodeURIComponent(createdDate);
+    }
+    if (projectStatus) {
+        if (customSearch) customSearch += '&';
+        customSearch += 'filter_project_status=' + encodeURIComponent(projectStatus);
+    }
+    if (inspector) {
+        if (customSearch) customSearch += '&';
+        customSearch += 'filter_inspectors=' + encodeURIComponent(inspector);
+    }
+
+    // Get the current URL and add custom_search parameter
+    var url = new URL(window.location.href);
+    url.searchParams.set('custom_search', customSearch);  // Set or update custom_search
+
+    // Redirect or send request with the updated URL
+    window.location.href = url.toString();  // This will reload the page with the new filters
+  });
 </script>
 
     <script>

@@ -157,6 +157,8 @@ class MediaController extends Controller
     public function listView(Request $request){
 
         $this->__view = 'admin/photo_feed';
+        // Retrieve all request parameters
+        $params = $request->all();
 
         $projects = Project::selectRaw('id,name')->where(['company_id' => $request['company_id']])->get();
         $user = User::selectRaw('id,first_name,last_name')->where(['company_id' => $request['company_id']])->whereNotNull('company_group_id')->get();
@@ -165,7 +167,20 @@ class MediaController extends Controller
         $data['projects'] = $projects;
         $data['user'] = $user;
         $data['tag'] = $tag;
-        $data['latest_photos'] = ProjectMedia::getLatestPhotos($request->all());
+
+        if (isset($params['project_ids'])) {
+            $params['project_ids'] = $params['project_ids'];
+        }
+        if (isset($params['user_ids'])) {
+            $params['user_ids'] = $params['user_ids'];
+        }
+        if (isset($params['tag_ids'])) {
+            $params['tag_ids'] = $params['tag_ids'];
+        }
+        if (isset($params['date'])) {
+            $params['date'] = $params['date'];
+        }
+        $data['latest_photos'] = ProjectMedia::getLatestPhotos($params);
 //        pd($data['latest_photos']->toArray(),'$data[\'latest_photos\']');
 
         $request->request->remove('company_id');

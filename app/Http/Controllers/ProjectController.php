@@ -698,74 +698,78 @@ class ProjectController extends Controller
 
     public function projectGrid(Request $request)
     {
+        // Retrieve all request parameters
         $params = $request->all();
 
+        // Parse the custom search string (from the custom_search query parameter)
         $output = [];
-        parse_str($params['custom_search'], $output);
-//        dd($output);
+        parse_str($params['custom_search'], $output); // This will populate $output with all the parameters inside custom_search
+        // dd($output);
+        // Merge custom_search parameters into the $params array
+        $params = array_merge($params, $output); // This ensures that custom_search parameters are added to the $params
+
+        // Add sorting and other necessary params
         $params['column_index'] = $params['order'][0]['column'];
         $params['sort'] = $params['order'][0]['dir'];
-
         $params['parent_id'] = 0;
-        $params['paginate']  = TRUE;
+        $params['paginate'] = true;
         $params['company_id'] = $request['company_id'];
         $params['user_group_id'] = 2;
         $params['type'] = 1;
         $params['keyword'] = $request['keyword'];
-        //Get Projects by role Start
 
-        // Retrieve the user
+        // Now, the filter values are already in $params and can be accessed as such
+        if (isset($params['filter_created_date'])) {
+            $params['filter_created_date'] = $params['filter_created_date'];
+        }
+
+        if (isset($params['filter_project_status']) && $params['filter_project_status'] != -1) {
+            $params['filter_project_status'] = $params['filter_project_status'];
+        }
+
+        if (isset($params['filter_inspectors']) && $params['filter_inspectors'] != -1) {
+            $params['filter_inspectors'] = $params['filter_inspectors'];
+        }
+
+        // Get the user from the session
         $user = User::where('id', session('user')->id)->first();
-        // $userInspectors = User::inspectorDatatable($params);
-        
-        
-        // Get the user's user group ID
         $userGroupId = $user->user_group_id;
-        // Check if the user is an admin
-        if ($userGroupId == 1) {
-            $roleName = 'admin';
-            $params['assigned_user_id'] = 'project.user_id';
-        } 
-        // Check if the user is an agent
-        elseif ($userGroupId == 2) {
-            $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
-            ->where('user.id', session('user')->id)
-            ->where('cg.id', $user->company_group_id)
-            ->first();
-            
-            $userType = $userInsector->role_id;
 
-            // \Log::info('userInsector' . $userType);
-            // \Log::info('userInsector' . $userInsector);
-            // $userType = $user->user_type;
-            
-            // Check if the user is a manager
-            if ($userType == 2) {
-                // $roleName = 'manager';
+        // Set the assigned user ID based on the role of the user
+        if ($userGroupId == 1) { // Admin
+            $params['assigned_user_id'] = 'project.user_id';
+        } elseif ($userGroupId == 2) { // Agent
+            $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+                ->where('user.id', session('user')->id)
+                ->where('cg.id', $user->company_group_id)
+                ->first();
+
+            $userType = $userInsector->role_id;
+            if ($userType == 2) { // Manager
                 $params['assigned_user_id'] = 'project.user_id';
-            } else if($userType == 3){
-                $roleName = 'standard';
+            } else if ($userType == 3) { // Standard
                 $params['assigned_user_id'] = 'project.assigned_user_id';
             }
         }
 
-        //Get Projects by role End
-
+        // Retrieve projects based on the filters
         $dataTableRecord = Project::getCompanyProjectsGrid($params);
+
+        // Get a list of inspectors to pass to the view
         $userWhere = [
             'company_id' => $request['company_id'],
             'user_group_id' => 2,
         ];
         $list['inspectors'] = User::where($userWhere)->selectRaw("id, CONCAT(first_name,' ',last_name) AS userNames")->get();
-        
 
-        // $data =  response()->json($dataTableRecord);
-        // $WorkingArray = json_decode($data,true);
-        // $data = json_decode(response()->json($dataTableRecord), true);
-        return view('admin/project', ['data' => $dataTableRecord],['listData' => json_decode($list['inspectors'])]);
-
-       
+        // Return the filtered project data along with the list of inspectors to the view
+        return view('admin/project', [
+            'data' => $dataTableRecord,
+            'listData' => json_decode($list['inspectors'])
+        ]);
     }
+
+
 
     public function projectDatatable(Request $request)
     {

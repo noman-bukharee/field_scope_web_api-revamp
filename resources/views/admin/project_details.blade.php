@@ -112,7 +112,7 @@
                         <div class="req-photo col-12">
                             <h4>Required Photos</h4>
                                 @if(!empty($data['reportUrl']))
-                                    <a href="{{$data['reportUrl']}}" target="_blank" class="report-btn">reports</a>
+                                    <a href="{{$data['reportUrl']}}" target="_blank" class="report-btn">View Report</a>
                                 @endif
                                 <div class="elevations">
                                     @foreach($data['proMedia']['required_category']  AS $rCatkey => $rCatItem)
@@ -486,16 +486,19 @@
             width: 150px;
             height: 150px;
             transition: .1s ease-in;
+            object-fit: cover;
         }
         .gallery.medium .photo img {
             width: 350px;
             height: 350px;
             transition: .1s ease-in;
+            object-fit: cover;
         }
         .gallery.thumbnail .photo img {
             width: 300px;
             height: 300px;
             transition: .1s ease-in;
+            object-fit: cover;
         }
         .gallery-view-selector {
             padding: 2rem 0rem;

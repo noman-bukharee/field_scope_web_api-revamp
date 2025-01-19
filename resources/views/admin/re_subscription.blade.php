@@ -20,11 +20,13 @@
                                 <label for="plan">Subscripion Plan</label>
                                 <select id="plan" name="plan" class="form-control inputs">
                                     <option disabled selected>Select Subscription Plan</option>
-                                    @foreach($data['subs'] AS $key => $item)
-                                        <option value="{{$item->id}}">{{ucfirst($item->type)}} - {{ucfirst($item->title)}} -
-                                            {{ucfirst($item->per_user_amount)}} per user - ({{$item->duration}} {{ucfirst($item->duration_unit)}})
-                                        </option>
-                                    @endforeach
+                                        @foreach($data['subs'] AS $key => $item)
+                                            @if($item->total_featured_deals >= 10)
+                                                <option value="{{$item->id}}">{{ucfirst($item->type)}} - {{ucfirst($item->title)}} -
+                                                    {{ucfirst($item->per_user_amount)}} per user - ({{$item->duration}} {{ucfirst($item->duration_unit)}})
+                                                </option>
+                                            @endif
+                                        @endforeach
                                 </select>
                             </div>
         

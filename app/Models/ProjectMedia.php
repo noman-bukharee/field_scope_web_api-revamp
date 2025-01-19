@@ -910,10 +910,14 @@ public static function addImageText_3($param = [])
 
     public static function getLatestPhotos($params)
     {
-
+        $output = [];
+        parse_str($params['custom_search'], $output);
+        
         $params['project_ids'] = !empty($params['project_ids']) ? [$params['project_ids']] : [];
         $params['user_ids'] = !empty($params['user_ids']) ? [$params['user_ids']] : [];
         $params['tag_ids'] = !empty($params['tag_ids']) ? [$params['tag_ids']] : [];
+
+        
 
         $q = self::select()->with(['media_tags']);
 

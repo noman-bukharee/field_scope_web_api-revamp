@@ -204,6 +204,7 @@ class Project extends Model
     public static function getCompanyProjectsGrid($params){
         $output = [];
         parse_str($params['custom_search'], $output);
+        // dd($output);
 
         $query = self::with(['getSingleMedia'])->leftJoin('user AS u', 'u.id', '=','project.assigned_user_id')
             ->where(['project.company_id' => $params['company_id']])->orderBy('id','DESC'); 
