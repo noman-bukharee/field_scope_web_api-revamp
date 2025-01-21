@@ -160,7 +160,7 @@ class MediaController extends Controller
         // Retrieve all request parameters
         $params = $request->all();
 
-        $projects = Project::selectRaw('id,name')->where(['company_id' => $request['company_id']])->get();
+        $projects = Project::selectRaw('id,name,assigned_user_id')->where(['company_id' => $request['company_id']])->get();
         $user = User::selectRaw('id,first_name,last_name')->where(['company_id' => $request['company_id']])->whereNotNull('company_group_id')->get();
         $tag = Tag::selectRaw('id,name')->where(['company_id' => $request['company_id']])->get();
 

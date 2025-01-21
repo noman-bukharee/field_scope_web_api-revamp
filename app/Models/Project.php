@@ -246,7 +246,7 @@ class Project extends Model
 
         //<editor-fold desc="Filters">
         if (!empty($output['filter_created_date'])) {
-            $query->whereDate("project.created_at", $output['filter_created_date']);
+            $query->whereDate("project.inspection_date", $output['filter_created_date']);
         }
 
         if (!empty($output['filter_project_status'])) {

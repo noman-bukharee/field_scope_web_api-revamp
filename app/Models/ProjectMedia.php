@@ -926,7 +926,7 @@ public static function addImageText_3($param = [])
             ['id', 'project_id', 'category_id', 'path', 'created_at', 'updated_at', 'note']
         );
         $uCols = User::customColumn(1, ['first_name', 'last_name', 'email', 'image_url'],'u');
-        $pCols = Project::customColumn(1, ['name','user_id', 'created_at'], 'p');
+        $pCols = Project::customColumn(1, ['id','name','user_id','assigned_user_id', 'created_at'], 'p');
         $q->select(array_merge($pmCols,$uCols,$pCols));
         $q->join('project','project.id','=','project_id');
         $q->join('user','user.id','=','project.user_id');

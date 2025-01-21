@@ -1,6 +1,38 @@
 @extends('admin.master')
 @section('content')
 @section('title', 'Photo Feeds')
+<?php
+// echo "<pre>";
+$session = \Session::all();
+$user = $session['user'];
+// print_r($session['user']); die;
+
+?>
+@php
+use App\Models\User;
+    
+
+    $userGroupId = $user->user_group_id;
+    if ($userGroupId == 1) {
+        $roleName = 'admin';
+    } 
+    elseif($userGroupId == 2){
+
+        //Get Agent role Title
+        $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+            ->where('user.id', session('user')->id)
+            ->where('cg.id', $user->company_group_id)
+            ->first();
+        if($userInsector->role_id == 2){
+            $roleName = 'manager';
+        }
+        else{
+            $roleName = 'standard';
+        }
+    }
+   
+@endphp
+
 <section class="container-fluid main-sec">
     <div class="row">
         <div class="col-12 mt-5">
@@ -36,11 +68,15 @@
         </div>
         <div class="col-12 mt-2">
             <div class="row" id="card-container">
+                <pre>
+                            
+                            </pre>
+                
                 @if(!empty($data['latest_photos']->total()))
                     @foreach($data['latest_photos'] AS $key => $item)
                         @if(!empty($item->path))
-
-                        <!-- {{$item->media_tags}} -->
+                            @if(session('user')->user_group_id == 1 || $roleName == 'manager' ||(session('user')->user_group_id == 2 && $item['p_assigned_user_id'] == session('user')->id))
+                            
                             <div class="col-12 col-md-6 col-lg-4 record-item">
                                 <div class="project-card photo-feed">
                                     <div class="project-card-header">
@@ -57,6 +93,7 @@
                                     </div>
                                     <div class="project-card-body">
                                         <div class="card-img-title">
+                                            
                                             <p class="title">{{$item->p_name}}</p>
                                             <!-- <p class="detail">755 Lindenwold Garden Apartments Ro</p> -->
                                             <div class="d-flex align-items-center justify-content-between">
@@ -78,6 +115,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif 
                         @endif    
                     @endforeach
                 @else

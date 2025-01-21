@@ -269,7 +269,7 @@ Route::group(['middleware' => ['login.auth','admin.auth'], 'prefix'=>'admin','as
             Route::get('photo_feed_datatable', 'ProjectController@projectDatatable');
         });
             // Other reports and settings access based on roles
-        Route::group(['middleware' => ['check.role:admin']], function () {
+        Route::group(['middleware' => ['check.role:admin,manager,standard']], function () {
             Route::get('photo_feed/edit/{id}', 'MediaController@editPhoto');
             Route::post('photo_feed/update/{id}', 'MediaController@updatePhoto');
             Route::get('photo_feed/details/{id}', 'MediaController@details');

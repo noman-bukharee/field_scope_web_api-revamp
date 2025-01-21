@@ -569,6 +569,7 @@
                         </button>
                         <span>Required</span>
                     </div>
+                    
                     <input type="hidden" name="is_required" value="false" class="test_class"/>
                     <div class="add-cancel-bnt">
                         <button type="button" class="btn btn-close cancelButton" data-dismiss="modal">

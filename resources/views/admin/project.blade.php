@@ -30,8 +30,13 @@ use App\Models\User;
             $roleName = 'standard';
         }
     }
+
+    
    
 @endphp
+<pre>
+<!-- {{print_r($allprojects)}} -->
+</pre>
 <section class="container-fluid main-sec">
     <div class="row">
         <div class="col-12 mt-5">
@@ -73,12 +78,12 @@ use App\Models\User;
         </div>
         <div class="col-12 mt-2">
             <div class="row" id="card-container">
-               
+            
                 @foreach($data as $item)
                     @if(is_array($item))
-                    
-                        @foreach($item as $key => $value)
+                    <!-- Role Based Logic -->
                         
+                        @foreach($item as $key => $value)
                             @if(session('user')->user_group_id == 1 || $roleName == 'manager' ||(session('user')->user_group_id == 2 && $value['assigned_user_id'] == session('user')->company_group_id)) 
                             
                                 @php

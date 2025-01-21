@@ -154,14 +154,17 @@
             {{csrf_field()}}
             <div class="row">
                 <div class="col-md-12 companyinfobody rm-companyinfobody-modified">
-                    <input class="form-control place-color" name="name" type="text" placeholder="Tag Name">
+                    <label class="mt-2 mb-2 form-label">Tag Name</label>
+                    <input class="form-control place-color" name="name" type="text" placeholder="Tag Name" required>
                 </div>
                 <div class="col-md-12 companyinfobody rm-companyinfobody-modified">
-                    <input class="form-control place-color" name="annotation" type="text" placeholder="Default Annotation Note">
+                    <label class="mt-2 mb-2 form-label">Annotation</label>
+                    <input class="form-control place-color" name="annotation" type="text" placeholder="Default Annotation Note" required>
                 </div>
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
-                    <select  name="ref_id"  class="form-select add-select">
-                        <option disabled selected>Photo View</option>
+                    <label class="mt-2 mb-2 form-label">Photo View</label>
+                    <select  name="ref_id"  class="form-select add-select" placeholder="Photo View" required>
+                        <option value="" disabled selected>Photo View</option>
                         @foreach($data['photoViews'] AS $key => $item)
                             <option value="{{$item['category2_id']}}">{{$item['category2_name']}}</option>
                         @endforeach
@@ -169,8 +172,9 @@
                 </div>
 
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
-                    <select name="spec_type" class="form-select add-select spec_type" id="">
-                        <option disabled selected>Spec Type</option>
+                    <label class="mt-2 mb-2 form-label">Spec Type</label>
+                    <select name="spec_type" class="form-select add-select spec_type" id="" required>
+                        <option value='' disabled selected>Spec Type</option>
                         @forelse($data['specTypes'] AS $key => $item)
                             <option value="{{$key}}">{{$item}}</option>
                         @empty
@@ -179,13 +183,15 @@
                     </select>
                 </div>
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified build_spec_group" style="display: none; ">
-                    <select name="build_spec" class=" form-control select-form build_spec" id="">
+                    <label class="mt-2 mb-2 form-label">Build Spec</label>
+                    <select id="" name="build_spec" class=" form-control select-form build_spec" id="">
                         <option disabled selected>Build Spec</option>
                     </select>
                 </div>
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified hover_field_type_group">
-                    <select name="hover_field_type_id" class="form-select add-select hover_field_type" id="">
-                        <option disabled selected>Hover Field Type</option>
+                    <label class="mt-2 mb-2 form-label">Hover Field Type</label>
+                    <select name="hover_field_type_id" class="form-select add-select hover_field_type" id="" required>
+                        <option value=""  disabled selected>Hover Field Type</option>
 
                         @forelse($data['hover_field_types'] AS $key => $item)
                             <option value="{{$item->id}}">{{$item->name}}</option>
@@ -196,33 +202,40 @@
                 </div>
                 <div class="col-md-6 companyinfobody rm-companyinfobody-select-modified hover_field_group"
                         style="display: none; ">
-                    <select name="hover_field_id" class="form-control add-select select-form hover_field" id="">
+                    <label class="mt-2 mb-2 form-label">Hover Field</label>
+                    <select name="hover_field_id" class="form-control add-select select-form hover_field" id="" >
                         <option disabled selected>Select Hover Field</option>
                     </select>
                 </div>
 
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
-                    <select name="has_qty"  class="form-select add-select" id="sel1">
-                        <option disabled selected>Quantity</option>
+                    <label class="mt-2 mb-2 form-label">Quantity</label>
+                    <select name="has_qty"  class="form-select add-select" id="sel1" required>
+                        <option value="" disabled selected>Quantity</option>
                         <option value="1">YES</option>
                         <option value="0">NO</option>
                     </select>
                 </div>
 
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                    <label class="mt-2 mb-2 form-label">Price</label>
                     <input class="form-control place-color" name="price" type="text"  placeholder="Price" readonly>
                 </div>
 
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                    <label class="mt-2 mb-2 form-label">Material Cost</label>
                     <input class="form-control place-color" name="material_cost" type="text" placeholder="Material">
                 </div>
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                    <label class="mt-2 mb-2 form-label">Equipment Cost</label>
                     <input class="form-control place-color" name="equipment_cost" type="text" placeholder="Equipment">
                 </div>
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                    <label class="mt-2 mb-2 form-label">Margin</label>
                     <input class="form-control place-color" name="margin" type="text" placeholder="Margin %">
                 </div>
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                    <label class="mt-2 mb-2 form-label">UOM</label>
                     <select name="uom_id"  class="form-select add-select" id="uom_id">
                         <option disabled selected>Select UOM</option>
 
@@ -234,21 +247,28 @@
                     </select>
                 </div>
                 <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                    <label class="mt-2 mb-2 form-label">Labor Cost</label>
                     <input class="form-control place-color" name="labor_cost" type="text" placeholder="Labor">
                 </div>
                 <div class="col-md-12 companyinfobody rm-companyinfobody-modified">
+                    <label class="mt-2 mb-2 form-label">Supervision Cost</label>
                     <input class="form-control place-color" name="supervision_cost" type="text" placeholder="Supervision">
                 </div>
 
             </div>
             <div class="modal-footer">
-                <div class="switch-btn">
+                <!-- <div class="switch-btn">
                     <button type="button" class="btn btn-sm btn-toggle" data-toggle="button"
                             aria-pressed="false" autocomplete="off">
                         <div class="handle"></div>
                     </button>
                     <span>Required</span>
+                </div> -->
+                <div class="form-check form-switch switch-btn">
+                    <input class="form-check-input btn-toggle" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Required</label>
                 </div>
+                <input type="hidden" name="is_required" value="false" class="test_class"/>
                 <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
                 <button type="submit" class="btn btn-save">Save </button>
             </div>
@@ -275,12 +295,15 @@
                 <div class="modal-body companyinfobody rm-companyinfobody-modified">
                 <div class="row">
                         <div class="col-md-12 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Tag Name</label>
                             <input class="form-control place-color" name="name" type="text" placeholder="Tag Name">
                         </div>
                         <div class="col-md-12 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Annotation</label>
                             <input class="form-control place-color" name="annotation" type="text" placeholder="Default Annotation Note">
                         </div>
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Photo View</label>
                             <select  name="ref_id"  class="form-select add-select">
                                 <option disabled selected>Photo View</option>
                                 @foreach($data['photoViews'] AS $key => $item)
@@ -290,6 +313,7 @@
                         </div>
 
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Spec Type</label>
                             <select name="spec_type" class="form-select add-select spec_type" id="">
                                 <option disabled selected>Spec Type</option>
                                 @forelse($data['specTypes'] AS $key => $item)
@@ -300,11 +324,13 @@
                             </select>
                         </div>
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified build_spec_group" style="display: none; ">
+                            <label class="mt-2 mb-2 form-label">Build Spec</label>
                             <select name="build_spec" class=" form-control select-form build_spec" id="">
                                 <option disabled selected>Build Spec</option>
                             </select>
                         </div>
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified hover_field_type_group">
+                            <label class="mt-2 mb-2 form-label">Hover Field Type</label>
                             <select name="hover_field_type_id" class="form-select add-select hover_field_type" id="">
                                 <option disabled selected>Hover Field Type</option>
 
@@ -317,12 +343,14 @@
                         </div>
                         <div class="col-md-6 companyinfobody rm-companyinfobody-select-modified hover_field_group"
                              style="display: none; ">
+                             <label class="mt-2 mb-2 form-label">Hover Field</label>
                             <select name="hover_field_id" class="form-control add-select select-form hover_field" id="">
                                 <option disabled selected>Select Hover Field</option>
                             </select>
                         </div>
 
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Quantity</label>
                             <select name="has_qty"  class="form-select add-select" id="sel1">
                                 <option disabled selected>Quantity</option>
                                 <option value="1">YES</option>
@@ -331,19 +359,24 @@
                         </div>
 
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Price</label>
                             <input class="form-control place-color" name="price" type="text"  placeholder="Price" readonly>
                         </div>
 
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Material Cost</label>
                             <input class="form-control place-color" name="material_cost" type="text" placeholder="Material">
                         </div>
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Equipment Cost</label>
                             <input class="form-control place-color" name="equipment_cost" type="text" placeholder="Equipment">
                         </div>
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Margin</label>
                             <input class="form-control place-color" name="margin" type="text" placeholder="Margin %">
                         </div>
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">UOM</label>
                             <select name="uom_id"  class="form-select add-select" id="uom_id">
                                 <option disabled selected>Select UOM</option>
 
@@ -355,22 +388,22 @@
                             </select>
                         </div>
                         <div class="col-md-6 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Labor Cost</label>
                             <input class="form-control place-color" name="labor_cost" type="text" placeholder="Labor">
                         </div>
                         <div class="col-md-12 companyinfobody rm-companyinfobody-modified">
+                            <label class="mt-2 mb-2 form-label">Supervision Cost</label>
                             <input class="form-control place-color" name="supervision_cost" type="text" placeholder="Supervision">
                         </div>
 
                     </div>
                 </div>
                 <div class="modal-footer">
-                <div class="switch-btn">
-                    <button type="button" class="btn btn-sm btn-toggle" data-toggle="button"
-                            aria-pressed="false" autocomplete="off">
-                        <div class="handle"></div>
-                    </button>
-                    <span>Required</span>
-                </div>
+                    <div class="form-check form-switch switch-btn">
+                        <input class="form-check-input btn-toggle" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                        <label class="form-check-label" for="flexSwitchCheckDefault">Required</label>
+                    </div>
+                    <input type="hidden" name="is_required" value="false" class="test_class"/>
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-save">Update </button>
                 </div>
@@ -475,7 +508,8 @@
                 scrollCollapse: true,
         
             });
-
+        });
+            
             // COST CALCULATION
 
             $('input[name="material_cost"], input[name="labor_cost"], input[name="equipment_cost"], input[name="supervision_cost"], input[name="margin"]').on('input', function (e){
@@ -489,6 +523,23 @@
                 let margin           = +$form.find('input[name="margin"]').val();
 
                 $form.find('input[name="price"]').val(((material_cost + labor_cost + equipment_cost + supervision_cost)/ (1- (margin/100)) ).toFixed(2));
+            });
+            $('button[data-bs-target="#exampleModal"]').on('click',function(e){
+                // e.preventDefault();
+                // The value of input[name="is_required"] should be true by default
+                $('#exampleModal .btn-toggle').attr('checked','checked');
+                // $('#exampleModal input[name="is_required"]').val(true);
+                $('#exampleModal .btn-toggle').closest('.modal-footer').find('input[name="is_required"]').val(true);
+            })
+            $('.btn-toggle').on('click',function(e){
+                let state = $(this).closest('.modal-footer').find('input[name="is_required"]').val();
+                // console.log(state)
+                if(state == 'true'){
+                    $(this).closest('.modal-footer').find('input[name="is_required"]').val(false); // Toggling
+                }else{
+                    $(this).closest('.modal-footer').find('input[name="is_required"]').val(true); // Toggling
+                }
+                console.log(state)
             });
 
             // Field Hover Calculation
@@ -514,9 +565,9 @@
             }
 
 
-                var selectedBuildSpec = '';
+            var selectedBuildSpec = '';
 
-                $('.spec_type').on('change', function (e) {
+            $('.spec_type').on('change', function (e) {
                 /*console.log('spec_type change');
                 console.log(e.target);*/
 
@@ -544,10 +595,10 @@
                     });
 
                 });
-                });
+            });
 
-                var selectedHoverField = '';
-                $('.hover_field_type').on('change', function (e) {
+            var selectedHoverField = '';
+            $('.hover_field_type').on('change', function (e) {
                 // console.log('hover_field_type change');
                 // console.log(e.target);
 
@@ -573,113 +624,122 @@
                     });
 
                 });
-                });
-        })
+            });
+       
 
-        function editRow(id) {
-            var $editModal = $('#editModal');
+            function editRow(id) {
+                var $editModal = $('#editModal');
 
-            // Fetch data via AJAX
-            $.ajax({
-               url: "{{URL::to('admin/photo_tags/editTagDetails/')}}/" + id,
-               method: "GET",
-               data: '',
-               success: function (response) {
-                   $('#update_form').attr('action', updateUrl + '/' + response.data.id);
-   
-                   $('#update_form input[name="name"]').val(response.data.name);
-                   $('#update_form input[name="annotation"]').val(response.data.annotation);
-                   $('#update_form input[name="price"]').val(response.data.price);
+                // Fetch data via AJAX
+                $.ajax({
+                url: "{{URL::to('admin/photo_tags/editTagDetails/')}}/" + id,
+                method: "GET",
+                data: '',
+                success: function (response) {
+                    $('#update_form').attr('action', updateUrl + '/' + response.data.id);
+    
+                    $('#update_form input[name="name"]').val(response.data.name);
+                    $('#update_form input[name="annotation"]').val(response.data.annotation);
+                    $('#update_form input[name="price"]').val(response.data.price);
 
-                   $('#update_form select[name="uom_id"] option').each(function (key,item) {
-                       if($(item).val() == response.data.uom_id){
-                           $(item).prop('selected', true);
-                       }
-                   });
+                    $('#update_form select[name="uom_id"] option').each(function (key,item) {
+                        if($(item).val() == response.data.uom_id){
+                            $(item).prop('selected', true);
+                        }
+                    });
 
-                   $('#update_form input[name="material_cost"]').val(response.data.material_cost);
-                   $('#update_form input[name="labor_cost"]').val(response.data.labor_cost);
-                   $('#update_form input[name="equipment_cost"]').val(response.data.equipment_cost);
-                   $('#update_form input[name="supervision_cost"]').val(response.data.supervision_cost);
-                   $('#update_form input[name="margin"]').val(response.data.margin);
+                    $('#update_form input[name="material_cost"]').val(response.data.material_cost);
+                    $('#update_form input[name="labor_cost"]').val(response.data.labor_cost);
+                    $('#update_form input[name="equipment_cost"]').val(response.data.equipment_cost);
+                    $('#update_form input[name="supervision_cost"]').val(response.data.supervision_cost);
+                    $('#update_form input[name="margin"]').val(response.data.margin);
 
-                   $('#update_form select[name="has_qty"] option').each(function (key, item) {
-                       if ($(item).val() == response.data.has_qty) {
-                           $(item).prop('selected', true);
-                       }
-                   });
+                    $('#update_form select[name="has_qty"] option').each(function (key, item) {
+                        if ($(item).val() == response.data.has_qty) {
+                            $(item).prop('selected', true);
+                        }
+                    });
 
-                   if (response.data.is_required) {
-                       isRequiredToggle($('#update_form .btn-toggle'), response.data.is_required > 0 ? 'true' : 'false');
-                   }
+                    if (response.data.is_required) {
+                        isRequiredToggle($('#update_form .btn-toggle'), response.data.is_required > 0 ? 'true' : 'false');
+                        //add checked to checkbox
+                        
+                    }
+                    if(response.data.is_required > 0){
+                        $('#update_form .btn-toggle').prop('checked', true);
+                    }
+                    else{
+                        $('#update_form .btn-toggle').prop('checked', false);
+                    }
 
-                   $('#update_form select[name="ref_id"] option').each(function (key, item) {
-                       if ($(item).val() == response.data.ref_id) {
-                           $(item).prop('selected', true);
-                       }
-                   });
+                    $('#update_form select[name="ref_id"] option').each(function (key, item) {
+                        if ($(item).val() == response.data.ref_id) {
+                            $(item).prop('selected', true);
+                        }
+                    });
 
-                   // console.log('response.data.build_spec',response.data.hover_field_type_id ,response.data.hover_field_id);
+                    // console.log('response.data.build_spec',response.data.hover_field_type_id ,response.data.hover_field_id);
 
-                   selectedBuildSpec = response.data.build_spec;
-                   selectedHoverField = response.data.hover_field_id;
-                   if(response.data.spec_type && response.data.build_spec >= 0){
-                       /*Selecting Spec Type and triggering change*/
-                       $('#update_form select[name="spec_type"] option').each(function (key, item) {
-                           if ($(item).val() == response.data.spec_type) {
-                               $(item).prop('selected', true);
-                               $('#update_form select[name="spec_type"]').trigger('change');
-                           }
-                       });
-                   }
+                    selectedBuildSpec = response.data.build_spec;
+                    selectedHoverField = response.data.hover_field_id;
+                    if(response.data.spec_type && response.data.build_spec >= 0){
+                        /*Selecting Spec Type and triggering change*/
+                        $('#update_form select[name="spec_type"] option').each(function (key, item) {
+                            if ($(item).val() == response.data.spec_type) {
+                                $(item).prop('selected', true);
+                                $('#update_form select[name="spec_type"]').trigger('change');
+                            }
+                        });
+                    }
 
-                   if(response.data.hover_field_type_id && response.data.hover_field_id > 0 ){
-                       $('#update_form select[name="hover_field_type_id"] option').each(function (key, item) {
-                           if ($(item).val() == response.data.hover_field_type_id) {
+                    if(response.data.hover_field_type_id && response.data.hover_field_id > 0 ){
+                        $('#update_form select[name="hover_field_type_id"] option').each(function (key, item) {
+                            if ($(item).val() == response.data.hover_field_type_id) {
 
-                               $(item).prop('selected', true);
-                               $('#update_form select[name="hover_field_type_id"]').trigger('change');
-                           }
-                       });
-                   }
+                                $(item).prop('selected', true);
+                                $('#update_form select[name="hover_field_type_id"]').trigger('change');
+                            }
+                        });
+                    }
 
-                   $editModal.modal('show');
-               },
-               error: function () {
-                   alert("No Network");
-               }
-           });
-
-        }
-
-        // Delete Row
-        var deleteId; // Store the id to be deleted
-
-        // Delete Row Function
-        function deleteRow(id) {
-            deleteId = id;  // Store the id to be used for deletion
-            $('#deleteConfirmationModal').modal('show');  // Show the confirmation modal
-        }
-
-        // Handle delete confirmation button click
-        $('#confirmDeleteButton').on('click', function() {
-            $.ajax({
-                url: '{!! url('admin/photo_tags/delete') !!}/' + deleteId,
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')  // Add CSRF token to the headers
+                    $editModal.modal('show');
                 },
-                dataType: 'JSON',
-                success: function(response) {
-                    $('#deleteConfirmationModal').modal('hide');  // Hide the modal after deletion
-                    window.location.reload();  // Reload the page upon successful deletion
-                },
-                error: function() {
-                    // Handle error if necessary
-                    $('#deleteConfirmationModal').modal('hide');  // Hide the modal even on error
+                error: function () {
+                    alert("No Network");
                 }
             });
-        });
+
+            }
+
+            // Delete Row
+            var deleteId; // Store the id to be deleted
+
+            // Delete Row Function
+            function deleteRow(id) {
+                deleteId = id;  // Store the id to be used for deletion
+                $('#deleteConfirmationModal').modal('show');  // Show the confirmation modal
+            }
+
+            // Handle delete confirmation button click
+            $('#confirmDeleteButton').on('click', function() {
+                $.ajax({
+                    url: '{!! url('admin/photo_tags/delete') !!}/' + deleteId,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')  // Add CSRF token to the headers
+                    },
+                    dataType: 'JSON',
+                    success: function(response) {
+                        $('#deleteConfirmationModal').modal('hide');  // Hide the modal after deletion
+                        window.location.reload();  // Reload the page upon successful deletion
+                    },
+                    error: function() {
+                        // Handle error if necessary
+                        $('#deleteConfirmationModal').modal('hide');  // Hide the modal even on error
+                    }
+                });
+            });
+       
         $(document).ready(function () {
             var width = $(window).width()
             $(window).resize(function (e) {

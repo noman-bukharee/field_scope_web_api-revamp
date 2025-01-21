@@ -755,6 +755,15 @@ class ProjectController extends Controller
         // Retrieve projects based on the filters
         $dataTableRecord = Project::getCompanyProjectsGrid($params);
 
+        //Retrive All Project List
+        // $param_rules['type'] = "nullable|in:1,2"; // 1:my_project | 2:assigned_project
+        // $param_rules['keyword'] = "nullable";
+        // $param_rules['project_status'] = "nullable|in:1,2"; // 1:open | 2:closed
+        // $listAllProjects = Project::getList($param);
+        $param = $request->all();
+        $param['paginate'] = FALSE;
+        $listAllProjects = Project::getList($param);
+
         // Get a list of inspectors to pass to the view
         $userWhere = [
             'company_id' => $request['company_id'],
@@ -765,7 +774,8 @@ class ProjectController extends Controller
         // Return the filtered project data along with the list of inspectors to the view
         return view('admin/project', [
             'data' => $dataTableRecord,
-            'listData' => json_decode($list['inspectors'])
+            'listData' => json_decode($list['inspectors']),
+            'allprojects' => $listAllProjects,
         ]);
     }
 

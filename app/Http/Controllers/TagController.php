@@ -224,7 +224,7 @@ class TagController extends Controller
         $param_rules['annotation'] = 'required|string|max:100';
         $param_rules['has_qty'] = 'required|int';
         $param_rules['ref_id'] = 'required|int';
-
+        $param_rules['is_required'] = 'nullable|in:false,true';
         $param_rules['price']            = 'nullable|numeric';
         $param_rules['uom_id']           = 'nullable|numeric';
         $param_rules['material_cost']    = 'nullable|numeric';
@@ -232,7 +232,6 @@ class TagController extends Controller
         $param_rules['equipment_cost']   = 'nullable|numeric';
         $param_rules['supervision_cost'] = 'nullable|numeric';
         $param_rules['margin']           = 'nullable|numeric';
-
         $messages = [
             'ref_id.required' => 'Req. Photo field is required',
             'has_qty.required' => 'Quantity field is required',
@@ -261,7 +260,8 @@ class TagController extends Controller
         $tag['name']        =             $request['name'];
         $tag['annotation']        =             $request['annotation'];
         $tag['has_qty']     =             $request['has_qty'];
-        $tag['is_required'] =             !empty($request['is_required']) ? $request['is_required'] : 0;
+        // $tag['is_required'] =             !empty($request['is_required']) ? $request['is_required'] : 0;
+        $tag['is_required'] = (!empty($request['is_required']) AND $request['is_required'] == 'true') ? 1 : 0;
         $tag['spec_type'] =               !empty($request['spec_type']) ? $request['spec_type'] : 0;
         $tag['build_spec'] =              !empty($request['build_spec']) ? $request['build_spec'] : 0;
         $tag['order_by'] =              !empty($maxTag) ? (int)$maxTag+1 : 1;
