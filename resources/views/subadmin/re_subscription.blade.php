@@ -2,7 +2,7 @@
 @section('content')
     <div class="row nomargin" id="top">
         <div class="col-md-9">
-        <h1 class="main-heading">Re-Subscribe</h1>
+        <h1 class="main-heading">Subscribe</h1>
         </div>
     </div>
     <div class="container">

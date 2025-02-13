@@ -115,96 +115,119 @@
                                     <a href="{{$data['reportUrl']}}" target="_blank" class="report-btn">View Report</a>
                                 @endif
                                 <div class="elevations">
-                                    @foreach($data['proMedia']['required_category']  AS $rCatkey => $rCatItem)
-                                    
-                                        @if($rCatItem['media_count'] > 0  )
-                                        
+                                    @if($rCatItem['category_name'])
+                                        @foreach($data['proMedia']['required_category']  AS $rCatkey => $rCatItem)
                                             <div class="d-flex flex-column gap-2">
                                                 <h4 class="panel-title">
                                                     {{$rCatItem['category_name']}} ({{$rCatItem['media_count']}}/{{$rCatItem['category_min_quantity']}})
                                                 </h4>
-                                                <p>{{$overall}}</p>
+                                                @if($rCatItem['media_count'] > 0  ) 
+                                                    <p>{{$overall}}</p>
+                                                @endif
                                             </div>
-                                            
-                                            @if(!empty($rCatItem['media']) )
-                                                <div class="elevation-items d-flex flex-row">
-                                                        @foreach($rCatItem['media'] AS $rCatMediaKey => $rCatMediaItem)  
-                                                        @php
-                                                            $requiredDate = $rCatMediaItem['created_at'];
-                                                            $time = date("h:i A", strtotime($requiredDate));
-                                                            $day = date("l", strtotime($requiredDate));
-                                                            $overall = date("l, F jS, Y", strtotime($requiredDate));
-                                                        @endphp
-                                                            <div class="small d-flex flex-column gap-2">                                       
-                                                                    <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($rCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> -->
-                                                                <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$rCatMediaItem['id']}}">
-                                                                    <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($rCatMediaItem['image_path'])}}">
-                                                                    <img src="{{URL::to($rCatMediaItem['image_path'])}}" alt="inspection photos" >
-                                                                </a> 
-                                                                <div class=" d-flex flex-row gap-2 justify-space">
-                                                                        <p>{{$time}} </p>
-                                                                        <p>{{$inspectorName}} </p>
-                                                                </div>
-                                                            </div>
-                                                        @endforeach
-                                                </div>
+                                            @if($rCatItem['media_count'] > 0  ) 
 
+                                                @if(!empty($rCatItem['media']) )
+                                                
+                                                    <div class="elevation-items d-flex flex-row">
+                                                            @foreach($rCatItem['media'] AS $rCatMediaKey => $rCatMediaItem)  
+                                                                @php
+                                                                    $requiredDate = $rCatMediaItem['created_at'];
+                                                                    $time = date("h:i A", strtotime($requiredDate));
+                                                                    $day = date("l", strtotime($requiredDate));
+                                                                    $overall = date("l, F jS, Y", strtotime($requiredDate));
+                                                                @endphp
+                                                                <div class="small d-flex flex-column gap-2">                                       
+                                                                        <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($rCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> -->
+                                                                    <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$rCatMediaItem['id']}}">
+                                                                        <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($rCatMediaItem['image_path'])}}">
+                                                                        <img src="{{URL::to($rCatMediaItem['image_path'])}}" alt="inspection photos" >
+                                                                    </a> 
+                                                                    <div class=" d-flex flex-row gap-2 justify-space">
+                                                                            <p>{{$time}} </p>
+                                                                            <p>{{$inspectorName}} </p>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                    </div>
+
+                                                
+                                            @endif 
                                             @else
                                                 <div id="img-popup">
                                                     <div class="text-center well">
-                                                        <h5>No Media</h5>
+                                                        <h5>No Media for {{$rCatItem['category_name']}} are uploaded yet</h5>
                                                     </div>
                                                 </div>
-                                            @endif
-                                        @endif
-                                    @endforeach
+                                            @endif   
+                                        @endforeach
+                                    @else
+                                        <div id="img-popup">
+                                            <div class="text-center well">
+                                                <h5>No Media are uploaded yet</h5>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                         </div>
                         <!-- Inspection Photos -->
                         <div class="ins-photo col-12">
                             <h4>Inspection Photos</h4>
                             <div class="elevations">
-                                @foreach($data['proMedia']['damaged_category']  AS $dCatkey => $dCatItem)
-                                    @if($dCatItem['media_count'] > 0)
+                                @if(!empty($dCatItem['category_name']))
+                                    @foreach($data['proMedia']['damaged_category']  AS $dCatkey => $dCatItem)
                                         <div class="d-flex flex-column gap-2">
                                             <h4 class="panel-title">
                                                 {{$dCatItem['category_name']}} ({{$dCatItem['media_count']}} / {{$dCatItem['category_min_quantity']}})
                                             </h4>
-                                            <p>{{$overall}}</p>
+                                            @if($dCatItem['media_count'] > 0)
+                                                <p>{{$overall}}</p>
+                                            @endif
                                         </div>
-                                        @if(!empty($dCatItem['get_child']))
-                                            @foreach($dCatItem['get_child'] AS $subCatKey => $subCatItem)
-                                                @if(!empty($subCatItem['media']) )
-                                                    <div class="elevation-items d-flex flex-row">
-                                                        @foreach($subCatItem['media'] AS $subCatMediaKey => $subCatMediaItem)
-                                                            @php
-                                                                $inspectionDate = $subCatMediaItem['created_at'];
-                                                                $time = date("h:i A", strtotime($inspectionDate));
-                                                                $day = date("l", strtotime($inspectionDate));
-                                                                $overall = date("l, F jS, Y", strtotime($inspectionDate));
-                                                            @endphp
-                                                            <div class="d-flex flex-column gap-2">
-                                                                <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($subCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> -->
-                                                                <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$subCatMediaItem['id']}}">
-                                                                    <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($subCatMediaItem['image_path'])}}">
-                                                                    <img src="{{URL::to($subCatMediaItem['image_path'])}}" alt="inspection photos">
-                                                                </a>
-                                                                <div class=" d-flex flex-row gap-2  justify-space">
-                                                                    <p>{{$time}} </p>
-                                                                    <p>{{$inspectorName}} </p>
-                                                               </div>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                @endif
-                                            @endforeach
+                                        @if($dCatItem['media_count'] > 0)
+                                            @if(!empty($dCatItem['get_child']))
+                                                @foreach($dCatItem['get_child'] AS $subCatKey => $subCatItem)
+                                                    @if(!empty($subCatItem['media']) )
+                                                        <div class="elevation-items d-flex flex-row">
+                                                            @foreach($subCatItem['media'] AS $subCatMediaKey => $subCatMediaItem)
+                                                                @php
+                                                                    $inspectionDate = $subCatMediaItem['created_at'];
+                                                                    $time = date("h:i A", strtotime($inspectionDate));
+                                                                    $day = date("l", strtotime($inspectionDate));
+                                                                    $overall = date("l, F jS, Y", strtotime($inspectionDate));
+                                                                @endphp
+                                                                <div class="d-flex flex-column gap-2">
+                                                                    <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($subCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> -->
+                                                                    <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$subCatMediaItem['id']}}">
+                                                                        <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($subCatMediaItem['image_path'])}}">
+                                                                        <img src="{{URL::to($subCatMediaItem['image_path'])}}" alt="inspection photos">
+                                                                    </a>
+                                                                    <div class=" d-flex flex-row gap-2  justify-space">
+                                                                        <p>{{$time}} </p>
+                                                                        <p>{{$inspectorName}} </p>
+                                                                </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            
+                                        @endif
                                         @else
-                                            <div class="text-center well">
-                                                <h5>No PhotoView</h5>
+                                            <div id="img-popup">
+                                                <div class="text-center well">
+                                                    <h5>No media for {{$dCatItem['category_name']}} are uploaded yet</h5>
+                                                </div>
                                             </div>
                                         @endif
-                                    @endif
-                                @endforeach
+                                    @endforeach
+                                @else
+                                    <div id="img-popup">
+                                        <div class="text-center well">
+                                            <h5>No media are uploaded yet</h5>
+                                        </div>
+                                    </div>    
+                                @endif
                             </div>
                         </div>
                         <!-- Additional  Photos -->
@@ -217,8 +240,10 @@
                                             <div class="d-flex flex-column gap-2">
                                                 <h4 class="panel-title">
                                                     {{$aCatItem['category_name']}}
-                                                    </h4>
-                                                <p>{{$overall}}</p>
+                                                </h4>
+                                                @if(!empty($aCatItem['media']) )
+                                                    <p>{{$overall}}</p>
+                                                @endif
                                             </div>
                                                 @if(!empty($aCatItem['media']) )
                                                     <div class="elevation-items d-flex flex-row">
@@ -243,8 +268,10 @@
                                                         @endforeach
                                                     </div>
                                                 @else
-                                                    <div class="text-center well">
-                                                        <h5>No PhotoView</h5>
+                                                    <div id="img-popup">
+                                                        <div class="text-center well">
+                                                            <h5>No media for {{$aCatItem['category_name']}} are upload yet</h5>
+                                                        </div>
                                                     </div>
                                                 @endif
                                         @endforeach
@@ -253,8 +280,10 @@
                                             <h4 class="panel-title">
                                                 {{$aCatItem['category_name']}}
                                             </h4>
-                                            <div class="text-center well">
-                                                <h5>No Media</h5>
+                                            <div id="img-popup">
+                                                <div class="text-center well">
+                                                    <h5>No media for {{$aCatItem['category_name']}} are upload yet</h5>
+                                                </div>
                                             </div>
                                         </div> 
                                     @endif       
@@ -456,7 +485,16 @@
         }
 
         h4.panel-title {
-            font-size: 16px !important;
+            font-size: 18px !important;
+            font-weight: 100 !important;
+            padding: 14px 0px;
+        }
+        div#img-popup h5 {
+            text-align: left;
+            font-size: 14px;
+            font-family: 'EuclidSquare-Light';
+            font-weight: 100 !important;
+            padding-bottom: 10px;
         }
         .form-control:disabled {
             opacity: .5;

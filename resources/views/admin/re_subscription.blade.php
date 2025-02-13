@@ -6,7 +6,7 @@
         <div class="col-12 mt-5">
             <div class="user-type-sec">
                 <div>
-                    <h2>Re-Subscribe</h2>
+                    <h2>Subscribe</h2>
                 </div>
             </div>
         </div>

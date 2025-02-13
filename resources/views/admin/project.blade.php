@@ -340,6 +340,9 @@ use App\Models\User;
             color: #00000082;
             border: 1px solid #00000029;
         }
+        input#filter {
+            padding: 0px 10px;
+        }
     </style>
 @endpush
 @push("page_js")

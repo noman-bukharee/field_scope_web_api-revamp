@@ -141,7 +141,7 @@ else{
 
         // If no items are found, display a "No projects found" message
         if (totalItems === 0) {
-            cardContainer.append('<p class="not-found">No projects found</p>'); // Add new message
+            // cardContainer.append('<p class="not-found">No projects found</p>'); // Add new message
             pagination.empty(); // Clear pagination if no items
             return; // Stop execution if no items
         }
