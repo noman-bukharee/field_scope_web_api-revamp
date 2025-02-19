@@ -9,9 +9,6 @@
     $inspectorName = '';
     $mediaImage_path = env('APP_URL').config('constants.MEDIA_IMAGE_PATH');
 @endphp
-<pre>
-    <!-- {{print_r($data)}} -->
-</pre>
 <section class="container-fluid main-sec">
     <div class="row">
         <div class="col-12 mt-2 details-row">
@@ -90,7 +87,7 @@
                     <!-- <button class="new-btn-theme mt-2" type="button">
                       Edit Project
                     </button> -->
-                    <a href="#" onclick="editRow({{$data['project']['id']}})"  class="new-btn-theme mt-2 edit-project btn-theme">Edit Project</a>
+                    <a href="#" onclick="editRow({{$data['project']['id']}})"  class="new-btn-theme mt-2 edit-project">Edit Project</a>
 
                   </div>
                 </div>
@@ -100,12 +97,12 @@
             <h1 class="heading">Photo Size</h1>
             <div class="action-btns">
                 <div class="gallery-view-selector">
-                    <button class="view-btn active btn-theme" data-size="small">Small</button>
-                    <button class="view-btn btn-theme" data-size="medium">Medium</button>
-                    <button class="view-btn btn-theme" data-size="thumbnail">Thumbnail</button>
+                    <button class="view-btn active" data-size="small">Small</button>
+                    <button class="view-btn" data-size="medium">Medium</button>
+                    <button class="view-btn" data-size="thumbnail">Thumbnail</button>
                 </div>
                 <div class="download-btns">
-                    <button id="download-selected" class="download-btn btn-theme">Download Photo</button>
+                    <button id="download-selected" class="download-btn">Download Photo</button>
                 </div>
             </div>
             <!-- Photos -->
@@ -116,7 +113,7 @@
                         <div class="req-photo col-12">
                             <h4>Required Photos</h4>
                                 @if(!empty($data['reportUrl']))
-                                    <a href="{{$data['reportUrl']}}" target="_blank" class="report-btn btn-theme">View Report</a>
+                                    <a href="{{$data['reportUrl']}}" target="_blank" class="report-btn">View Report</a>
                                 @endif
                                 <div class="elevations">
                                         @foreach($data['proMedia']['required_category']  AS $rCatkey => $rCatItem)
@@ -143,29 +140,10 @@
                                                                 @endphp
                                                                 <div class="small d-flex flex-column gap-2">                                       
                                                                         <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($rCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> -->
-                                                                    <!-- <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$rCatMediaItem['id']}}">
+                                                                    <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$rCatMediaItem['id']}}">
                                                                         <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($rCatMediaItem['image_path'])}}">
                                                                         <img src="{{URL::to($rCatMediaItem['image_path'])}}" alt="inspection photos" >
-                                                                    </a>  -->
-                                                                    <div class="download-event">
-                                                                        <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($rCatMediaItem['image_path'])}}">
-
-                                                                        <a  href="#" class="open-modal" 
-                                                                            data-bs-toggle="modal" 
-                                                                            data-bs-target="#imageModal" 
-                                                                            data-image="{{ URL::to($rCatMediaItem['image_path']) }}"
-                                                                            data-title="{{ $overall }}"
-                                                                            data-name="{{ $rCatItem['name'] }}"
-                                                                            data-annotation="{{ $rCatItem['annotation'] }}"
-                                                                            data-edit="{{URL::to('admin/project/photo/edit/')}}/{{$rCatMediaItem['id']}}"
-                                                                            
-                                                                            >
-                                                                            
-                                                                            <div class="media-img">
-                                                                                <img src="{{URL::to($rCatMediaItem['image_path'])}}" alt="required photos">
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
+                                                                    </a> 
                                                                     <div class=" d-flex flex-row gap-2 justify-space">
                                                                             <p>{{$time}} </p>
                                                                             <p>{{$inspectorName}} </p>
@@ -189,9 +167,11 @@
                         <!-- Inspection Photos -->
                         <div class="ins-photo col-12">
                             <h4>Inspection Photos</h4>
+                            <pre>
+                                {{print_r($data['proMedia']['damaged_category'])}}
+                            </pre>
                             <div class="elevations">
                                     @foreach($data['proMedia']['damaged_category']  AS $dCatkey => $dCatItem)
-                                    
                                         <div class="d-flex flex-column gap-2">
                                             <h4 class="panel-title">
                                                 {{$dCatItem['category_name']}} ({{$dCatItem['media_count']}} / {{$dCatItem['category_min_quantity']}})
@@ -203,9 +183,7 @@
                                         @if($dCatItem['media_count'] > 0)
                                             @if(!empty($dCatItem['get_child']))
                                                 @foreach($dCatItem['get_child'] AS $subCatKey => $subCatItem)
-                                                
                                                     @if(!empty($subCatItem['media']) )
-                                                    
                                                         <div class="elevation-items d-flex flex-row">
                                                             @foreach($subCatItem['media'] AS $subCatMediaKey => $subCatMediaItem)
                                                                 @php
@@ -216,32 +194,13 @@
                                                                 @endphp
                                                                 <div class="d-flex flex-column gap-2">
                                                                     <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($subCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}"> -->
-                                                                    <!-- <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$subCatMediaItem['id']}}">
+                                                                    <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$subCatMediaItem['id']}}">
                                                                         <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($subCatMediaItem['image_path'])}}">
                                                                         <div class="media-img">
                                                                             <img src="{{URL::to($subCatMediaItem['image_path'])}}" alt="inspection photos">
                                                                         </div>
                                                                         
-                                                                    </a> -->
-                                                                    <div class="download-event">
-                                                                        <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($subCatMediaItem['image_path'])}}">
-                                                                        <a  href="#" class="open-modal" 
-                                                                            data-bs-toggle="modal" 
-                                                                            data-bs-target="#imageModal" 
-                                                                            data-image="{{ URL::to($subCatMediaItem['image_path']) }}"
-                                                                            data-title="{{ $overall }}"
-                                                                            data-name="{{ $subCatItem['name'] }}"
-                                                                            data-annotation="{{ $subCatItem['annotation'] }}"
-                                                                            data-edit="{{URL::to('admin/project/photo/edit/')}}/{{$subCatMediaItem['id']}}"
-                                                                            
-                                                                            >
-                                                                            
-                                                                            
-                                                                            <div class="media-img">
-                                                                                <img src="{{URL::to($subCatMediaItem['image_path'])}}" alt="inspection photos">
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
+                                                                    </a>
                                                                     <div class=" d-flex flex-row gap-2  justify-space">
                                                                         <p>{{$time}} </p>
                                                                         <p>{{$inspectorName}} </p>
@@ -291,34 +250,14 @@
                                                             @endphp
                                                             <div class="d-flex flex-column gap-2">
                                                                 <!-- <a class="image-popup-vertical-fit" download="{{$overall}}.jpg" href="{{URL::to($subCatMediaItem['image_path'])}}" title="{{$day}}, {{$time}}">  -->
-                                                                <!-- <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$rCatMediaItem['id']}}">
+                                                                <a class="checked-photos" href="{{URL::to('admin/project/photo/details/')}}/{{$rCatMediaItem['id']}}">
                                                                     <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($rCatMediaItem['image_path'])}}">
                                                                     <img src="{{URL::to($rCatMediaItem['image_path'])}}" alt="inspection photos">
-                                                                </a> -->
-                                                                <div class="download-event">
-                                                                    <input type="checkbox" class="select-photo form-check-input" data-download="{{URL::to($rCatMediaItem['image_path'])}}">
-
-                                                                    <a  href="#" class="open-modal" 
-                                                                        data-bs-toggle="modal" 
-                                                                        data-bs-target="#imageModal" 
-                                                                        data-image="{{ URL::to($rCatMediaItem['image_path']) }}"
-                                                                        data-title="{{ $overall }}"
-                                                                        data-name="{{ $aCatItem['name'] }}"
-                                                                        data-annotation="{{ $aCatItem['annotation'] }}"
-                                                                        data-edit="{{URL::to('admin/project/photo/edit/')}}/{{$rCatMediaItem['id']}}"
-                                                                        
-                                                                        >
-                                                                        
-                                                                        <div class="media-img">
-                                                                            <img src="{{URL::to($rCatMediaItem['image_path'])}}" alt="required photos">
-                                                                        </div>
-                                                                    </a>
-                                                                </div>
+                                                                </a>
                                                                 <div class=" d-flex flex-row gap-2  justify-space">
                                                                     <p>{{$time}} </p>
                                                                     <p>{{$inspectorName}} </p>
                                                                </div>
-                                                               
                                                             </div>
                                                         @endforeach
                                                     </div>
@@ -406,182 +345,11 @@
     </div>
   </div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Image Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body d-flex">
-                <div id="gallery" class="col-md-9 media-data">
-                    <div class="modal-image images">
-                        <img id="modalImage" src="" class="img-fluid" alt="Selected Image">
-                    </div>
-                </div>
-                <div class="col-md-3 img-details">
-                    <!-- <h4 id="imageTitle"></h4>
-                    <h5 id="surveyTitle"></h5>
-                    <p id="imageAnnotation"></p> -->
-                    <div class="card details-row-card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ isset($data['project']['name']) ?  $data['project']['name'] : 'No Name' }}</h5>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Area:</label>
-                                        <h5>{{ isset($data['category']['name']) ?  $data['category']['name'] : 'N/A' }}</h5>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Lat:</label>
-                                        <h5>{{ isset($data['project']['latitude'])  ? $data['project']['latitude'] : 'N/A' }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Inspection Date:</label>
-                                        <h5>{{\Carbon\Carbon::parse($data['project']['inspection_date'])->format('d/m/y') }}</h5>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Long:</label>
-                                        <h5>{{ isset($data['project']['longitude']) ? $data['project']['longitude'] : 'N/A' }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Claim No:</label>
-                                        <h5>{{ isset($data['project']['claim_num']) ? $data['project']['claim_num'] : 'N/A' }}</h5>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Quantity:</label>
-                                        <h5>{{ isset($data['category']['min_quantity'])  ? $data['category']['min_quantity'] : 'N/A' }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group annotation">
-                                <label>Photo Tag annotation:</label>
-                                <h5>{{ isset($data['note']) ? $data['note'] : 'N/A' }}</h5>
-                            </div>
-                            <div class="photo-action-btn">
-                                <a id="download-link" style="color:#fff !important" class="btn btn-primary btn-theme" href="">Edit</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-theme" id="prevImage">Previous</button>
-                <button type="button" class="btn btn-secondary btn-theme" id="nextImage">Next</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 @endsection
 
 @push("page_css")
     <style>
-        .details-row {
-            background: #ffffff;
-            padding: 15px 2px;
-            border-radius: 10px;
-        }
-        h5.card-title {
-            font-size: 32px;
-            padding: 10px 0px;
-            border-bottom: 1px solid #bfbfbf;
-        }
-
-        .card.details-row-card {
-            background: #f7f7fa;
-            padding: 0;
-        }
-
-        .details-row .row {
-            padding: 10px 0px;
-        }
-
-        .details-row .row .form-group {
-            border: 1px solid #0000001c;
-            border-radius: 7px;
-            background: #fff;
-            padding: 15px 25px;
-        }
-        .photo-action-btn {
-            padding: 15px 0px;
-        }
-
-        .photo-action-btn a {
-            width: 100%;
-            color: #fff !important;
-            font-family: 'EuclidSquare-Light';
-            font-size: 16px;
-            padding: 10px 0px;
-            transition: .3s ease-in;
-        }
-
-        .photo-action-btn a:hover {
-            color: #000 !important;
-            border: 1px solid #0000003d;
-            background: #fff;
-        }
-
-        .card.details-row-card .form-group label {
-            color: #323588;
-            font-family: 'EuclidSquare-Light';
-            font-size: 14px;
-        }
-
-        .card.details-row-card .form-group h5 {
-            color: #000124;
-            font-size: 16px;
-            padding: 5px 0px;
-        }
-        .form-group.annotation {
-            border: 1px solid #0000001c;
-            border-radius: 7px;
-            background: #fff;
-            padding: 15px 25px;
-        }
-        #imageModal .modal-dialog.modal-lg {
-            max-width: 95%;
-        }
-        .modal-image {
-            height: 800px;
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-            justify-content: flex-start;
-            background: #00000014;
-        }
-        img#modalImage {
-            width: 100%;
-            height: inherit;
-            object-fit: contain;
-            /* object-position: top; */
-        }
-        .img-details {
-            padding: 0rem 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background: #f7f7fa;
-        }
-        .download-event {
-            display: flex;
-            gap: 5px;
-        }
-
         .justify-space{
             justify-content: space-around;
         }
@@ -634,7 +402,7 @@
             border-radius: 12px;
         } */
         .elevation-items {
-            gap: 8px;
+            gap: 20px;
             padding: 20px 0px;
             flex-wrap: wrap;
         }
@@ -794,7 +562,7 @@
             color: #fff;
         }
 
-        .gallery.small .elevation-items a{
+        .gallery.small .checked-photos {
             display: flex;
             flex-direction: row;
             align-items: flex-start;
@@ -802,7 +570,7 @@
             width: 100px;
             height: 100px;
         }
-        .gallery.medium .elevation-items a {
+        .gallery.medium .checked-photos {
             display: flex;
             flex-direction: row;
             align-items: flex-start;
@@ -810,7 +578,7 @@
             width: 180px;
             height: 180px;
         }
-        .gallery.thumbnail .elevation-items a {
+        .gallery.thumbnail .checked-photos {
             display: flex;
             flex-direction: row;
             align-items: flex-start;
@@ -844,60 +612,7 @@
 @push("page_js")
 <script src="{{asset('assets/js/moment.min.js')}}" ></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js'></script>
-
 <script>
-    $(document).ready(function () {
-        let currentIndex = 0;
-        let images = [];
-
-        $(".open-modal").click(function () {
-            const imageUrl = $(this).data("image");
-            const title = $(this).data("title");
-            const surveyTitle = $(this).data("name");
-            const downloadLink = $(this).data("edit");
-            const annotation = $(this).data("annotation");
-
-            $("#modalImage").attr("src", imageUrl);
-            $("#imageTitle").text(title);
-            $("#surveyTitle").text(surveyTitle);
-            $("#imageAnnotation").text(annotation);
-            $("#download-link").attr("href", downloadLink);
-
-            currentIndex = $(this).parent().index();
-            images = $(this).closest('.elevation-items').find('.open-modal').map(function() {
-                return {
-                    image: $(this).data("image"),
-                    title: $(this).data("title"),
-                    name: $(this).data("name"),
-                    annotation: $(this).data("annotation"),
-                    edit: $(this).data("edit")
-                };
-            }).get();
-        });
-
-        $("#prevImage").click(function () {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateModalContent();
-            }
-        });
-
-        $("#nextImage").click(function () {
-            if (currentIndex < images.length - 1) {
-                currentIndex++;
-                updateModalContent();
-            }
-        });
-
-        function updateModalContent() {
-            const image = images[currentIndex];
-            $("#modalImage").attr("src", image.image);
-            $("#imageTitle").text(image.title);
-            $("#surveyTitle").text(image.name);
-            $("#imageAnnotation").text(image.annotation);
-            $("#download-link").attr("href", image.edit);
-        }
-    });
     // Handle gallery view switching and active button styling
     document.querySelectorAll('.view-btn').forEach((button) => {
         button.addEventListener('click', (event) => {

@@ -1,13 +1,6 @@
 @extends('admin.master')
 @section('content')
 @section('title', 'Project Photo Detail')
-<pre>
-<!-- {{print_r($data)}} -->
-<!-- {{print_r($data['latest_photos'])}} -->
-</pre>
-<pre>
-    <!-- {{print_r($data)}} -->
-    </pre>
 <section class="container-fluid main-sec">
     <div class="row details-row mt-4">
         <div class="col-md-5 ">
@@ -66,6 +59,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
         <div class="col-md-7">
             <div class="feed-img" style="background-image:url('{{URL::to('uploads/media/'.$data['path'] )}}')">

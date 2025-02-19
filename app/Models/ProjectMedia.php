@@ -277,8 +277,8 @@ class ProjectMedia extends Model
     {
 
         $where['project_id'] = $projectId;
+        
         foreach ($categories AS $key => $item) {
-
             $where['target_id'] = $item['id'];
             $where['target_type'] = "category";
 
@@ -304,7 +304,7 @@ class ProjectMedia extends Model
                 }
             }
         }
-
+        
         return $categories;
     }
 

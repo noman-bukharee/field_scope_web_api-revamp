@@ -179,7 +179,7 @@ else{
 
             // Show a range of pages around the current page
             var startPage = Math.max(2, page - 1); // Start from 2 or one before current
-            var endPage = Math.min(totalPages - 1, page + 1); // End at totalPages - 1 or one after current
+            var endPage = Math.min(totalPages - 1, page + 2); // End at totalPages - 1 or one after current
             
             for (var i = startPage; i <= endPage; i++) {
                 appendPageItem(pagination, i, page);

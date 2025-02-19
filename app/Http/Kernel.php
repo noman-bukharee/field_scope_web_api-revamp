@@ -64,5 +64,6 @@ class Kernel extends HttpKernel
         'subscription.auth' => \App\Http\Middleware\SubscriptionAuth::class,
         'responseTime' => \App\Http\Middleware\MeasureResponseTime::class,
         'check.role' => \App\Http\Middleware\CheckRole::class,
+        // 'set.loader' => App\Http\Middleware\SetLoader::class,
     ];
 }

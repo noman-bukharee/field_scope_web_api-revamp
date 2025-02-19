@@ -754,12 +754,6 @@ class ProjectController extends Controller
 
         // Retrieve projects based on the filters
         $dataTableRecord = Project::getCompanyProjectsGrid($params);
-
-        //Retrive All Project List
-        // $param_rules['type'] = "nullable|in:1,2"; // 1:my_project | 2:assigned_project
-        // $param_rules['keyword'] = "nullable";
-        // $param_rules['project_status'] = "nullable|in:1,2"; // 1:open | 2:closed
-        // $listAllProjects = Project::getList($param);
         $param = $request->all();
         $param['paginate'] = FALSE;
         $listAllProjects = Project::getList($param);
@@ -770,7 +764,13 @@ class ProjectController extends Controller
             'user_group_id' => 2,
         ];
         $list['inspectors'] = User::where($userWhere)->selectRaw("id, CONCAT(first_name,' ',last_name) AS userNames")->get();
-
+        // foreach($dataTableRecord['records'] as $record){
+        //     media = ProjectMedia::getById($record['id'],['tags_data','category']);
+        //     $list["media"][] = [
+        //         'category'=>$media
+        //     ];
+        // }
+        // project_photo_details
         // Return the filtered project data along with the list of inspectors to the view
         return view('admin/project', [
             'data' => $dataTableRecord,
@@ -1069,6 +1069,8 @@ class ProjectController extends Controller
         $list['proMedia']['required_category'] = ProjectMedia::getMediaForCategories($cats['required_category'], $id);
         $list['proMedia']['damaged_category'] = ProjectMedia::getMediaForCategories($cats['damaged_category'], $id);
         $list['proMedia']['additional_photos'] = ProjectMedia::getMediaForCategories([$cats['additional_photos']], $id);
+        $list['proMedia']['all'] = ProjectMedia::getMediaForCategories([$cats], $id);
+        // $list['media_category'] = ProjectMedia::getById($id,['tags_data','category']);
 
         $userWhere = [
             'company_id' => $request['company_id'],

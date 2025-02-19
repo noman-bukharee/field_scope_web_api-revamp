@@ -71,13 +71,13 @@ use App\Models\User;
                 <pre>
                             
                             </pre>
-                
+                            
                 @if(!empty($data['latest_photos']->total()))
                     @foreach($data['latest_photos'] AS $key => $item)
                         @if(!empty($item->path))
                             @if(session('user')->user_group_id == 1 || $roleName == 'manager' ||(session('user')->user_group_id == 2 && $item['p_assigned_user_id'] == session('user')->id))
                             
-                            <div class="col-12 col-md-6 col-lg-4 record-item">
+                            <div class="col-sm-6 col-md-4 col-lg-3 record-item">
                                 <div class="project-card photo-feed">
                                     <div class="project-card-header">
                                         <a href="photo_feed/details/{{$item['id']}}">
@@ -103,12 +103,12 @@ use App\Models\User;
                                                 </ul>
                                                 <div class="feed-action">
                                                     <div class="photo-action-btn">
-                                                        <a href="{{url('admin/photo_feed/edit/'.$item['id'])}}" class="d-flex btn btn-primary mr-2">
+                                                        <a href="{{url('admin/project/photo/edit/'.$item['id'])}}" class="d-flex btn btn-primary mr-2">
                                                         <img src="{{asset("assets/img/edit-icon.png")}}" alt=""> Edit</a>
                                                     </div>
-                                                    <div class="photo-action-btn view">
+                                                    <!-- <div class="photo-action-btn view">
                                                         <a href="photo_feed/details/{{$item['id']}}" class="btn btn-primary mr-2"> View</a>
-                                                    </div>
+                                                    </div> -->
                                                 </div>
                                             </div>
                                         </div>  
@@ -248,6 +248,17 @@ use App\Models\User;
         .feed-action {
             display: flex;
             gap: 12px;
+        }
+        .project-card-header {
+            box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+        .project-card .project-card-header .card-img img {
+            object-fit: contain;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
         }
 
     </style>

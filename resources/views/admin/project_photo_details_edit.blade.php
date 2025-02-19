@@ -5,69 +5,7 @@
 </pre>
 <section class="container-fluid main-sec">
     <div class="row details-row mt-4">
-        <div class="col-md-5 ">
-            <div class="card details-row-card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ isset($data['pMedia']['project']['name']) ?  $data['pMedia']['project']['name'] : 'No Name' }}</h5>
-                    <form id="photo_feed_update">
-                    {{csrf_field()}}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Area:</label>
-                                    <h5>{{isset($data['pMedia']['category']['name']) ?  $data['pMedia']['category']['name'] : 'N/A' }}</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Lat:</label>
-                                    <h5>{{isset($data['pMedia']['project']['latitude']) ?   $data['pMedia']['project']['latitude'] : 'N/A' }}</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Inspection Date:</label>
-                                    <h5>{{\Carbon\Carbon::parse($data['pMedia']['project']['inspection_date'])->format('m/d/y') }}</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Long:</label>
-                                    <h5>{{isset($data['pMedia']['project']['longitude']) ?    $data['pMedia']['project']['longitude'] : 'N/A' }}</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Claim No:</label>
-                                    <h5>{{isset($data['pMedia']['project']['claim_num']) ?   $data['pMedia']['project']['claim_num'] : 'N/A' }}</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Quantity:</label>
-                                    <h5>{{isset($data['pMedia']['category']['min_quantity']) ?    $data['pMedia']['category']['min_quantity'] : 'N/A' }}</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group annotation">
-                            <label>Photo Tag annotation:</label>
-                            <textarea class="form-control" rows="6" name="note" id="noteField">{{isset($data['pMedia']['note']) ?   $data['pMedia']['note'] : '' }}</textarea>
-                            <!-- <h5>Test Sync</h5> -->
-                        </div>
-                        <div class="photo-action-btn">
-                            <!-- <a href="{{url('admin/photo_feed/edit/'.$data['id'])}}" class="btn btn-primary mr-2">Edit</a> -->
-                            <input type="button" class="btn btn-primary mr-2" name="save" id="save" value="Done"/>
-                            <a href="{{url('admin/project/detail')}}/{{$data['pMedia']['project']['id']}}" class="btn btn-primary mr-2"> Cancel </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-7">
+        <div class="col-md-12">
              @if(!$data['pMedia']['tags_data']->isEmpty()) 
                 <a href="javascript:;" data-bs-toggle="modal" data-bs-target="#myModal">
                     <span class="tag-badge">
@@ -80,6 +18,62 @@
              @endif 
             <div id="editor" style="height: 800px"></div>
         </div>
+        <!-- <div class="col-md-3 ">
+            <div class="card details-row-card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ isset($data['pMedia']['project']['name']) ?  $data['pMedia']['project']['name'] : 'No Name' }}</h5>
+                    <form id="photo_feed_update">
+                    {{csrf_field()}}
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label>Area:</label>
+                                    <h5>{{isset($data['pMedia']['category']['name']) ?  $data['pMedia']['category']['name'] : 'N/A' }}</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label>Lat:</label>
+                                    <h5>{{isset($data['pMedia']['project']['latitude']) ?   $data['pMedia']['project']['latitude'] : 'N/A' }}</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label>Inspection Date:</label>
+                                    <h5>{{\Carbon\Carbon::parse($data['pMedia']['project']['inspection_date'])->format('m/d/y') }}</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label>Long:</label>
+                                    <h5>{{isset($data['pMedia']['project']['longitude']) ?    $data['pMedia']['project']['longitude'] : 'N/A' }}</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label>Claim No:</label>
+                                    <h5>{{isset($data['pMedia']['project']['claim_num']) ?   $data['pMedia']['project']['claim_num'] : 'N/A' }}</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label>Quantity:</label>
+                                    <h5>{{isset($data['pMedia']['category']['min_quantity']) ?    $data['pMedia']['category']['min_quantity'] : 'N/A' }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group annotation">
+                            <label>Photo Tag annotation:</label>
+                            <textarea class="form-control" rows="6" name="note" id="noteField">{{isset($data['pMedia']['note']) ?   $data['pMedia']['note'] : '' }}</textarea>
+                        </div>
+                        <div class="photo-action-btn">
+                            <input type="button" class="btn btn-primary mr-2" name="save" id="save" value="Done"/>
+                            <a href="{{url('admin/project/detail')}}/{{$data['pMedia']['project']['id']}}" class="btn btn-primary mr-2"> Cancel </a>
+                        </div>
+                    </form>
+            </div>
+        </div> -->
+        
     </div>
 </section>
 <pre>`
@@ -274,8 +268,8 @@
             margin-left: 20px;
         }
         /* Hide ImgLY */
-        .sc-cMljjf.lfgeyf[direction="vertical"]:first-child ul div:nth-child(n+2):nth-child(-n+7),
-        .sc-cMljjf.lfgeyf[direction="vertical"]:first-child ul div:nth-child(9) {
+        .sc-cMljjf.gnoHEE[direction="horizontal"]:first-child ul div:nth-child(n+2):nth-child(-n+7),
+        .sc-cMljjf.gnoHEE[direction="horizontal"]:first-child ul div:nth-child(9) {
             display:none;
         }
     </style>
@@ -314,7 +308,7 @@
         image: imageUrl,
         assetBaseUrl: "{{asset('assets/pesdk')}}",
         language: 'en',
-        layout: 'advanced',
+        layout: 'basic',
         theme: 'light',
         defaultTool: 'library',
         scaleImageToFit: true,

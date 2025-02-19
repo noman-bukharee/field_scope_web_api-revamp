@@ -5,7 +5,10 @@
 // echo "<pre>";
 $session = \Session::all();
 $user = $session['user'];
-// print_r($session['user']); die;
+$mediaImage_path = env('APP_URL').config('constants.MEDIA_IMAGE_PATH');
+// $mediaImage_path = 'http://127.0.0.1:8000/uploads/media/';
+
+$mediaImage = '';
 
 ?>
 @php
@@ -34,16 +37,12 @@ use App\Models\User;
     
    
 @endphp
-<pre>
-<!-- {{print_r($allprojects)}} -->
-</pre>
 <section class="container-fluid main-sec">
     <div class="row">
         <div class="col-12 mt-5">
             <div class="user-type-sec">
                 <div>
                     <h2>Projects</h2>
-                    <!-- <pre>{{ print_r($data, true) }}</pre> -->
                     
                 </div>
                 <div class="d-flex align-items-center">
@@ -120,13 +119,21 @@ use App\Models\User;
                                             $time_ago = $interval->i . " minutes ago";
                                         }
                                     }
+                                    if(!empty($value['get_single_media']['path']))
+                                    { 
+                                        $mediaImage = $mediaImage_path.$value['get_single_media']['path']; 
+                                    }
+                                    else{
+                                        $mediaImage = asset("assets/img/card-img.png");
+                                    }
                                 @endphp
                                 <div id="demo" class="col-12 col-md-6 col-lg-4 record-item">
                                     <div class="project-card">
                                         <div class="project-card-header">
                                             <div class="card-img">
                                                 <a href="{{ URL::to('admin/project/detail')}}/{{ $value['id'] }}">
-                                                    <img src="../assets/img/card-img.png" alt="">
+                                                    
+                                                    <img src="{{$mediaImage}}" alt="">
                                                 </a>
                                                 <div class="card-img-title">
                                                     <p class="title">{{ $value['name'] ?  $value['name'] : 'No data available' }}</p>
@@ -201,6 +208,10 @@ use App\Models\User;
                                                     <div class="project-detail mt-3">
                                                         <p class="detail-title">Inspection Date:</p>
                                                         <p>{{ $inspection_date ?   $inspection_date : 'No data available' }}</p>
+                                                    </div>
+                                                    <div class="project-detail mt-3">
+                                                        <p class="detail-title">Media Count:</p>
+                                                        <p>{{ $value['media_count']['total'] ?   $value['media_count']['total'] : 'No media' }}</p>
                                                     </div>
                                                 </div>
                                             </div>

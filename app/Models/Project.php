@@ -201,110 +201,109 @@ class Project extends Model
 //        return $query->paginate(Config::get('constants.PAGINATION_PAGE_SIZE'));
 //    }
 
-    public static function getCompanyProjectsGrid($params){
-        $output = [];
-        parse_str($params['custom_search'], $output);
-        // dd($output);
+public static function getCompanyProjectsGrid($params){
+    $output = [];
+    parse_str($params['custom_search'], $output);
 
-        $query = self::with(['getSingleMedia'])->leftJoin('user AS u', 'u.id', '=','project.assigned_user_id')
-            ->where(['project.company_id' => $params['company_id']])->orderBy('id','DESC'); 
+    // Include project_media relationship with category in the query
+    $query = self::with(['getSingleMedia', 'project_media.category'])
+        ->leftJoin('user AS u', 'u.id', '=', 'project.assigned_user_id')
+        ->where(['project.company_id' => $params['company_id']])
+        ->orderBy('id', 'DESC');
 
-        $mediaPath = url(Config::get('constants.USER_IMAGE_PATH'));
-        $placeHolder = url('image/default_user.png');
-        $mapImagePath = url('uploads/map/map_');
-        // uploads/map/map_{$projectId}.jpg
-        $query->selectRaw("
-        project.id ,
-            project.name ,
-            project.address1,
-            project.created_at ,
-            project.project_status ,
-            project.last_crm_sync_at,
-            project.inspection_date,
-            project.claim_num,
-            project.customer_email,
-            CONCAT(u.first_name,' ',u.last_name) AS assigned_user,
-            u.company_group_id AS assigned_user_id,
-            IF(CONCAT('$mediaPath',u.image_url) IS NULL or CONCAT('$mediaPath',u.image_url) = '', '$placeHolder', CONCAT('$mediaPath',u.image_url)) AS image_url,
-            CONCAT('$mapImagePath',project.id,'.jpg') project_map_image
+    $mediaPath = url(Config::get('constants.USER_IMAGE_PATH'));
+    $placeHolder = url('image/default_user.png');
+    $mapImagePath = url('uploads/map/map_');
 
+    $query->selectRaw("
+        project.id,
+        project.name,
+        project.address1,
+        project.created_at,
+        project.project_status,
+        project.last_crm_sync_at,
+        project.inspection_date,
+        project.claim_num,
+        project.customer_email,
+        project.latitude,
+        project.longitude,
+        CONCAT(u.first_name, ' ', u.last_name) AS assigned_user,
+        u.company_group_id AS assigned_user_id,
+        IF(CONCAT('$mediaPath', u.image_url) IS NULL OR CONCAT('$mediaPath', u.image_url) = '', '$placeHolder', CONCAT('$mediaPath', u.image_url)) AS image_url,
+        CONCAT('$mapImagePath', project.id, '.jpg') project_map_image
+    ");
+
+    if (!empty($output['keyword'])) {
+        $keyword = $output['keyword'];
+        $query->whereRaw("
+            (project.name LIKE '%$keyword%'
+            OR u.first_name LIKE '%$keyword%'
+            OR u.last_name LIKE '%$keyword%')
         ");
+    }
 
+    // Filters
+    if (!empty($output['filter_created_date'])) {
+        $query->whereDate("project.inspection_date", $output['filter_created_date']);
+    }
 
-        if (!empty($output['keyword'])) {
-            $keyword = $output['keyword'];
-            $query->whereRaw("
-                (project.name LIKE '%$keyword%'
-                OR u.first_name LIKE '%$keyword%'
-                OR u.last_name LIKE '%$keyword%')
-            ");
+    if (!empty($output['filter_project_status'])) {
+        $query->whereRaw("
+            project.project_status = {$output['filter_project_status']}
+        ");
+    }
+
+    if (!empty($output['filter_inspectors'])) {
+        $query->whereRaw("
+            project.assigned_user_id = {$output['filter_inspectors']}
+        ");
+    }
+
+    $data['total_record'] = $query->count();
+
+    $query = $query->get();
+
+    $query = $query->map(function ($item, $key) {
+        $imagePath = "uploads/map/map_{$item['id']}.jpg";
+        if (!file_exists(public_path($imagePath))) {
+            $item['project_map_image'] = NULL;
         }
-
-//        "filter_created_date" => "2022-01-12"
-//  "filter_project_status" => "2"
-//  "filter_inspectors" => "81"
-
-        //<editor-fold desc="Filters">
-        if (!empty($output['filter_created_date'])) {
-            $query->whereDate("project.inspection_date", $output['filter_created_date']);
-        }
-
-        if (!empty($output['filter_project_status'])) {
-            $query->whereRaw("
-                project.project_status = {$output['filter_project_status']}
-            ");
-        }
-
-        if (!empty($output['filter_inspectors'])) {
-            $query->whereRaw("
-                project.assigned_user_id = {$output['filter_inspectors']}
-            ");
-        }
-        //</editor-fold>
-
-        $sortMap = [
-            'project.name',
-            'assigned_user',
-            'assigned_user_id',
-            'project.created_at',
+        
+        // Filter project media to include only required, damaged, and additional photos
+        $filteredMedia = $item->project_media->filter(function ($media) {
+            // Assuming 'category' has a 'type' column that identifies the category
+            $categoryType = $media->category->type ?? null;
+            // dd($media->category);
+            
+            // Include media only if it belongs to required (1), damaged (2), or additional (3) categories
+            return in_array($categoryType, [1, 2, 3]); // Update these values based on your system
+        });
+        // dd( $query );
+        // Add media count for each category
+        $item['media_count'] = [
+            'required' => $filteredMedia->where('category.type', 1)->count(), // Update value for 'required'
+            'damaged' => $filteredMedia->where('category.type', 2)->count(), // Update value for 'damaged'
+            'additional' => $filteredMedia->where('category.type', 3)->count(), // Update value for 'additional'
+            'total' => $filteredMedia->count(), // Total media count for all categories
         ];
 
-        $data['total_record'] = $query->count();
-
-//        $params['pageSize']
-//        $params['pageNumber']
-
-
-//        if(empty($sortMap[$params['column_index']])){
-//            $params['column_index'] = empty($sortMap[$params['column_index']]) ? 0 : $params['column_index'];
-//            $query = $query->take($params['length'])->skip($params['start'])->orderBy('id','DESC');
-//        }else{
-//            $params['column_index'] = empty($sortMap[$params['column_index']]) ? 0 : $params['column_index'];
-//            $query = $query->take($params['length'])->skip($params['start'])->orderBy($sortMap[$params['column_index']],$params['sort']);
-//        }
-
-        // if(empty($params['pageSize']) OR empty($params['pageNumber']) ){
-        //     $params['pageSize'] = 820;
-        //     $params['pageNumber'] = 2;
-        // }
-
-        // $query->take( $params['pageSize'])->skip(($params['pageNumber']-1)*$params['pageSize'])->orderBy('created_at','DESC');
-
-        $query = $query->get();
-
-        $query = $query->map(function ($item,$key){
-
-            $imagePath = "uploads/map/map_{$item['id']}.jpg";
-            if(!file_exists(public_path($imagePath))){
-                $item['project_map_image'] = NULL;
-            }
-            return $item;
+        // Optionally, include the filtered media details if needed
+        $item['project_media'] = $filteredMedia->map(function ($media) {
+            return [
+                'id' => $media->id,
+                'path' => $media->path,
+                'category_type' => $media->category->type ?? null, // Category type (1, 2, 3)
+                'category_name' => $media->category->name ?? null, // Optional: Include category name
+            ];
         });
 
-        $data['records'] = $query->toArray();
+        return $item;
+    });
 
-        return $data;
-    }
+    $data['records'] = $query->toArray();
+
+    return $data;
+}
 
     public static function getCompanyProjectsDatatable_withUsers($params){
         $output = [];
