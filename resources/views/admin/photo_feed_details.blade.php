@@ -12,7 +12,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ isset($data->project->name) ?  $data->project->name : 'No Name' }}</h5>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label>Area:</label>
                                 <h5>{{ isset($data->category->name) ?  $data->category->name : 'N/A' }}</h5>
@@ -26,13 +26,13 @@
                         </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <div class="form-group">
                                     <label>Inspection Date:</label>
                                     <h5>{{\Carbon\Carbon::parse($data['project']['inspection_date'])->format('d/m/y') }}</h5>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 ">
                                 <div class="form-group">
                                     <label>Long:</label>
                                     <h5>{{ isset($data->project->longitude) ? $data->project->longitude : 'N/A' }}</h5>
@@ -40,13 +40,13 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <div class="form-group">
                                     <label>Claim No:</label>
                                     <h5>{{ isset($data->project->claim_num) ? $data->project->claim_num : 'N/A' }}</h5>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <div class="form-group">
                                     <label>Quantity:</label>
                                     <h5>{{ isset($data->category->min_quantity)  ? $data->category->min_quantity : 'N/A' }}</h5>
@@ -142,11 +142,18 @@
             border: 1px solid #0000003d;
             background: #fff;
         }
-        .feed-img {
+        /* .feed-img {
             background-position: center;
             background-size: cover;
             height: 100%;
             border-radius: 7px;
+        } */
+        .feed-img {
+            background-position: center;
+            background-size: contain;
+            height: 100%;
+            border-radius: 7px;
+            background-repeat: no-repeat;
         }
         .photo-action-btn i {
             padding: 0px 2px;

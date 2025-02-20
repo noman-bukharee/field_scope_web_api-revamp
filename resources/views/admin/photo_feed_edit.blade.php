@@ -5,7 +5,7 @@
 </pre>
 <section class="container-fluid main-sec">
     <div class="row details-row mt-4">
-        <div class="col-md-5 ">
+        <!-- <div class="col-md-5 ">
             <div class="card details-row-card">
                 <div class="card-body">
                     <h5 class="card-title">{{ isset($data['pMedia']['project']['name']) ?  $data['pMedia']['project']['name'] : 'No Name' }}</h5>
@@ -56,18 +56,16 @@
                         <div class="form-group annotation">
                             <label>Photo Tag annotation:</label>
                             <textarea class="form-control" rows="6" name="note" id="noteField">{{isset($data['pMedia']['note']) ?   $data['pMedia']['note'] : '' }}</textarea>
-                            <!-- <h5>Test Sync</h5> -->
                         </div>
                         <div class="photo-action-btn">
-                            <!-- <a href="{{url('admin/photo_feed/edit/'.$data['id'])}}" class="btn btn-primary mr-2">Edit</a> -->
                             <input type="button" class="btn btn-primary mr-2" name="save" id="save" value="Done"/>
                             <a href="{{url('admin/photo_feed')}}" class="btn btn-primary mr-2"> Cancel </a>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
-        <div class="col-md-7">
+        </div> -->
+        <div class="col-md-12">
              @if(!$data['pMedia']['tags_data']->isEmpty()) 
                 <a href="javascript:;" data-bs-toggle="modal" data-bs-target="#myModal">
                     <span class="tag-badge">
@@ -202,6 +200,13 @@
             height: 100%;
             border-radius: 7px;
         }
+        /* .feed-img {
+            background-position: center;
+            background-size: contain;
+            height: 100%;
+            border-radius: 7px;
+            background-repeat: no-repeat;
+        } */
         div#editor {
             position: relative;
         }
@@ -274,8 +279,8 @@
             margin-left: 20px;
         }
         /* Hide ImgLY */
-        .sc-cMljjf.lfgeyf[direction="vertical"]:first-child ul div:nth-child(n+2):nth-child(-n+7),
-        .sc-cMljjf.lfgeyf[direction="vertical"]:first-child ul div:nth-child(9) {
+        .sc-cMljjf.gnoHEE[direction="horizontal"]:first-child ul div:nth-child(n+2):nth-child(-n+7),
+        .sc-cMljjf.gnoHEE[direction="horizontal"]:first-child ul div:nth-child(9) {
             display:none;
         }
     </style>
@@ -323,7 +328,7 @@
         image: imageUrl,
         assetBaseUrl: "{{asset('assets/pesdk')}}",
         language: 'en',
-        layout: 'advanced',
+        layout: 'basic',
         theme: 'light',
         defaultTool: 'library',
         scaleImageToFit: true,
