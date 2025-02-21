@@ -20,7 +20,7 @@ class CreateMediaTable extends Migration {
 			$table->string('path', 100);
 			$table->timestamps();
 			$table->softDeletes();
-			$table->enum('media_type', array('image','audio','video','pdf'))->nullable();
+			$table->enum('media_type', ['image','audio','video','pdf'])->nullable();
 		});
 	}
 

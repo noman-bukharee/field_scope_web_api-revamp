@@ -111,7 +111,7 @@ class readXlsx {
     const SCHEMA_REL_SHAREDSTRINGS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings';
     const SCHEMA_REL_WORKSHEET = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet';
     const SCHEMA_REL_STYLES = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles';
-    public static $CF = array( // Cell formats
+    public static $CF = [ // Cell formats
         0  => 'General',
         1  => '0',
         2  => '0.00',
@@ -158,14 +158,14 @@ class readXlsx {
         68 => 't0.00%',
         69 => 't# ?/?',
         70 => 't# ??/??',
-    );
-    public $cellFormats = array();
+    ];
+    public $cellFormats = [];
     public $datetimeFormat = 'Y-m-d H:i:s';
     /* @var SimpleXMLElement $workbook */
     private $workbook;
     /* @var SimpleXMLElement[] $sheets */
-    private $sheets = array();
-    private $sheetNames = array();
+    private $sheets = [];
+    private $sheetNames = [];
     // scheme
     private $styles;
     private $hyperlinks;
@@ -217,13 +217,13 @@ class readXlsx {
 
     public function __construct( $filename, $is_data = false, $debug = false ) {
         $this->debug   = $debug;
-        $this->package = array(
+        $this->package = [
             'filename' => '',
             'mtime'    => 0,
             'size'     => 0,
             'comment'  => '',
-            'entries'  => array()
-        );
+            'entries'  => []
+        ];
         if ( $this->_unzip( $filename, $is_data ) ) {
             $this->_parse();
         }
@@ -232,7 +232,7 @@ class readXlsx {
     private function _unzip( $filename, $is_data = false ) {
 
         // Clear current file
-        $this->datasec = array();
+        $this->datasec = [];
 
         if ( $is_data ) {
 
@@ -270,17 +270,17 @@ class readXlsx {
 
             return false;
         }
-        $aE = array(
+        $aE = [
             0 => $this->_substr( $vZ, 0, $pcd ),
             1 => $this->_substr( $vZ, $pcd + 3 )
-        );
+        ];
 
         // Normal way
         $aP                       = unpack( 'x16/v1CL', $aE[1] );
         $this->package['comment'] = $this->_substr( $aE[1], 18, $aP['CL'] );
 
         // Translates end of line from other operating systems
-        $this->package['comment'] = strtr( $this->package['comment'], array( "\r\n" => "\n", "\r" => "\n" ) );
+        $this->package['comment'] = strtr( $this->package['comment'], [ "\r\n" => "\n", "\r" => "\n" ] );
 
         // Cut the entries from the central directory
         $aE = explode( "\x50\x4b\x01\x02", $vZ );
@@ -291,7 +291,7 @@ class readXlsx {
 
         // Loop through the entries
         foreach ( $aE as $vZ ) {
-            $aI       = array();
+            $aI       = [];
             $aI['E']  = 0;
             $aI['EM'] = '';
             // Retrieving local file header information
@@ -385,14 +385,14 @@ class readXlsx {
                 ( ( $aP['FD'] & 0xfe00 ) >> 9 ) + 1980 );
 
             //$this->Entries[] = &new SimpleUnzipEntry($aI);
-            $this->package['entries'][] = array(
+            $this->package['entries'][] = [
                 'data'      => $aI['D'],
                 'error'     => $aI['E'],
                 'error_msg' => $aI['EM'],
                 'name'      => $aI['N'],
                 'path'      => $aI['P'],
                 'time'      => $aI['T']
-            );
+            ];
 
         } // end for each entries
 
@@ -414,8 +414,8 @@ class readXlsx {
 
     private function _parse() {
         // Document data holders
-        $this->sharedstrings = array();
-        $this->sheets        = array();
+        $this->sharedstrings = [];
+        $this->sheets        = [];
 //		$this->styles = array();
 
         // Read relations and search for officeDocument
@@ -428,7 +428,7 @@ class readXlsx {
 
                 if ( $rel_type === self::SCHEMA_REL_OFFICEDOCUMENT && $this->workbook = $this->getEntryXML( $rel_target ) ) {
 
-                    $index_rId = array(); // [0 => rId1]
+                    $index_rId = []; // [0 => rId1]
 
                     $index = 0;
                     foreach ( $this->workbook->sheets->sheet as $s ) {
@@ -475,7 +475,7 @@ class readXlsx {
 
                                 $this->styles = $this->getEntryXML( $wrel_path );
 
-                                $nf = array();
+                                $nf = [];
                                 if ( $this->styles->numFmts->numFmt !== null ) {
                                     foreach ( $this->styles->numFmts->numFmt as $v ) {
                                         $nf[ (int) $v['numFmtId'] ] = (string) $v['formatCode'];
@@ -572,7 +572,7 @@ class readXlsx {
     }
 
     private function _parseRichText( $is = null ) {
-        $value = array();
+        $value = [];
 
         if ( isset( $is->t ) ) {
             $value[] = (string) $is->t;
@@ -610,12 +610,12 @@ class readXlsx {
         }
         list( $numCols, $numRows) = $this->dimension( $worksheetIndex );
 
-        $emptyRow = array();
+        $emptyRow = [];
         for( $i = 0; $i < $numCols; $i++) {
             $emptyRow[] = '';
         }
 
-        $rows = array();
+        $rows = [];
         for( $i = 0; $i < $numRows; $i++) {
             $rows[] = $emptyRow;
         }
@@ -648,7 +648,7 @@ class readXlsx {
             return false;
         }
 
-        $rows = array();
+        $rows = [];
 
         list( $numCols, $numRows) = $this->dimension( $worksheetIndex );
 
@@ -661,7 +661,7 @@ class readXlsx {
                 for ( $k = $x; $k >= 0; $k = (int) ( $k / 26 ) - 1 ) {
                     $c = chr( $k % 26 + 65 ) . $c;
                 }
-                $rows[ $y ][ $x ] = array(
+                $rows[ $y ][ $x ] = [
                     'type'   => '',
                     'name'   => $c . ( $y + 1 ),
                     'value'  => '',
@@ -669,7 +669,7 @@ class readXlsx {
                     'f'      => '',
                     'format' => '',
                     'r' => $y
-                );
+                ];
             }
         }
 
@@ -697,7 +697,7 @@ class readXlsx {
                     $format = '';
                 }
 
-                $rows[ $curR ][ $curC ] = array(
+                $rows[ $curR ][ $curC ] = [
                     'type'   => $t,
                     'name'   => (string) $c['r'],
                     'value'  => $this->value( $c ),
@@ -705,7 +705,7 @@ class readXlsx {
                     'f'      => (string) $c->f,
                     'format' => $format,
                     'r' => $r_idx
-                );
+                ];
                 $curC++;
             }
             $curR ++;
@@ -734,7 +734,7 @@ class readXlsx {
             $ws = $this->sheets[ $worksheetIndex ];
 
             if ( isset( $ws->hyperlinks ) ) {
-                $this->hyperlinks = array();
+                $this->hyperlinks = [];
                 foreach ( $ws->hyperlinks->hyperlink as $hyperlink ) {
                     $this->hyperlinks[ (string) $hyperlink['ref'] ] = (string) $hyperlink['display'];
                 }
@@ -757,7 +757,7 @@ class readXlsx {
     public function dimension( $worksheetIndex = 0 ) {
 
         if ( ( $ws = $this->worksheet( $worksheetIndex ) ) === false ) {
-            return array(0,0);
+            return [0,0];
         }
         /* @var SimpleXMLElement $ws */
 
@@ -767,12 +767,12 @@ class readXlsx {
             $d = explode( ':', $ref );
             $index = $this->getIndex( $d[1] );
 
-            return array( $index[0] + 1, $index[1] + 1 );
+            return [ $index[0] + 1, $index[1] + 1 ];
         }
         if ( $ref !== '' ) { // 0.6.8
             $index = $this->getIndex( $ref );
 
-            return array( $index[0] + 1, $index[1] + 1 );
+            return [ $index[0] + 1, $index[1] + 1 ];
         }
 
         // slow method
@@ -791,7 +791,7 @@ class readXlsx {
             }
         }
 
-        return array( $maxC+1, $maxR+1 );
+        return [ $maxC+1, $maxR+1 ];
     }
 
     public function getIndex( $cell = 'A1' ) {
@@ -807,11 +807,11 @@ class readXlsx {
                 $index += ( ord( $col{$i} ) - 64 ) * pow( 26, $colLen - $i - 1 );
             }
 
-            return array( $index - 1, $row - 1 );
+            return [ $index - 1, $row - 1 ];
         }
 //		$this->error( 'Invalid cell index ' . $cell );
 
-        return array(-1,-1);
+        return [-1,-1];
     }
 
     public function value( $cell ) {

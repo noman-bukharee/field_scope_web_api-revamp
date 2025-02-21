@@ -56,7 +56,7 @@ class BrainTree
     public function addCustomer($params)
     {
 
-        $response = (object)array();
+        $response = (object)[];
         try {
 
             $result = \Braintree_Customer::create($params);
@@ -88,7 +88,7 @@ class BrainTree
     public function addCard($params)
     {
 
-        $response = (object)array();
+        $response = (object)[];
         try {
             $result = \Braintree\CreditCard::create([
                 'customerId' => $params['customerId'],
@@ -123,7 +123,7 @@ class BrainTree
     public function addPaymentMethod($params)
     {
 
-        $response = (object)array();
+        $response = (object)[];
         try {
             $result = \Braintree_PaymentMethod::create([
                 'customerId' => $params['customerId'],
@@ -158,7 +158,7 @@ class BrainTree
     public function charge($param)
     {
 
-        $response = (object)array();
+        $response = (object)[];
         try {
             $result = \Braintree_Transaction::sale($param);
             if ($result->success) {
@@ -188,7 +188,7 @@ class BrainTree
     public function customerSubscription($param)
     {
 
-        $response = (object)array();
+        $response = (object)[];
         //PaymentMethodNonce::find();
         try {
             $result = \Braintree_Subscription::create($param);

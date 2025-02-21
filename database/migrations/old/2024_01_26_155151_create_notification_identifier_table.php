@@ -16,8 +16,8 @@ class CreateNotificationIdentifierTable extends Migration {
 		{
 			$table->integer('id', true);
 			$table->string('identifier', 100);
-			$table->enum('notification_type', array('push','email','none','web'))->default('none');
-			$table->enum('send_type', array('actor','target','both'));
+			$table->enum('notification_type', ['push','email','none','web'])->default('none');
+			$table->enum('send_type', ['actor','target','both']);
 			$table->string('title')->nullable();
 			$table->text('message', 65535)->nullable();
 			$table->timestamps();

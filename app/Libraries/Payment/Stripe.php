@@ -188,13 +188,13 @@ class Stripe
     {
         try{
             \Stripe\Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
-            $charge = \Stripe\Charge::create(array(
+            $charge = \Stripe\Charge::create([
                 "amount"         => $data['amount'] * 100,
                 "currency"       => $data['currency'],
                 "source"         => $data['token'],
                 "description"    => $data['description'],
                 "transfer_group" => $data['transfer_group'],
-            ));
+            ]);
         }catch (\Exception $e){
             return $this->_response = [
                 'code'    => 400, //status code
@@ -218,12 +218,12 @@ class Stripe
     {
         try{
             \Stripe\Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
-            $transfer = \Stripe\Transfer::create(array(
+            $transfer = \Stripe\Transfer::create([
                 "amount" => $data['amount'] * 100,
                 "currency" => $data['currency'],
                 "destination" => $data['destination'],//'acct_1EdE1NLBq37AWvff',
                 "transfer_group" => $data['transfer_group'], //unique identifier
-            ));
+            ]);
         }catch(\Exception $e){
             return $this->_response = [
                 'code'    => 400, //status code

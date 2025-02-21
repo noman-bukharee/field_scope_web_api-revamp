@@ -22,7 +22,7 @@ class CreateProjectMediaTable extends Migration {
 			$table->string('note', 100)->nullable();
 			$table->timestamps();
 			$table->softDeletes();
-			$table->enum('media_type', array('image','audio','video','pdf'))->nullable();
+			$table->enum('media_type', ['image','audio','video','pdf'])->nullable();
 			$table->string('ref_id', 50)->nullable();
 		});
 	}

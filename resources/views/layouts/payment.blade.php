@@ -8,9 +8,9 @@ function isPost($server){
 
 function requestSale($token, $amount){
     global $referenceNumber, $responseMessage;
-    $client = new SoapClient('https://ps1.merchantware.net/Merchantware/ws/retailTransaction/v4/credit.asmx?WSDL', array('trace' => true));
+    $client = new SoapClient('https://ps1.merchantware.net/Merchantware/ws/retailTransaction/v4/credit.asmx?WSDL', ['trace' => true]);
     $response = $client->SaleVault(
-        array(
+        [
             'merchantName'           => 'TEST',
             'merchantSiteId'         => 'XXXXXXXX',
             'merchantKey'            => 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX',
@@ -20,7 +20,7 @@ function requestSale($token, $amount){
             'forceDuplicate'         => 'true',
             'registerNumber'         => '123',
             'merchantTransactionId'  => '1234'
-        )
+        ]
     );
     $result = $response->SaleVaultResult;
     $responseMessage = $result->ApprovalStatus;
