@@ -194,7 +194,6 @@ class ReportController extends Controller
 
     public function getReportOptions_v3(Request $request, $projectId)
     {
-        //<editor-fold desc="Validation">
         $param_rules['project_id'] = [
             'required',
             'int',
@@ -208,8 +207,6 @@ class ReportController extends Controller
         if ($this->__is_error == true)
             return $response;
 
-        //</editor-fold>
-
         $report = Report::where(['project_id' => $projectId])->first(['id', 'options']);
         $lastSelectedOptions = collect([]);
 
@@ -220,22 +217,13 @@ class ReportController extends Controller
         $options = collect();
 
         $companyReportM = new CompanyReport();
-        $companyReport = $companyReportM->where(['company_id' => $request['company_id']])->first(
-            ['is_disclaimer', 'json_data']
-        );
+        $companyReport = $companyReportM->where(['company_id' => $request['company_id']])->first(['is_disclaimer', 'json_data']);
 
         $ownAuthorization = json_decode($companyReport->json_data, true);
 
-        $pageBreak = [
-            'key' => "page_break",
-            'title' => null,
-        ];
+        $pageBreak = ['key' => "page_break", 'title' => null];
+        $rules = ['required' => true];
 
-        $rules = [
-            'required' => true,
-        ];
-
-        //<editor-fold desc="Photo Selection">
         $category = new Category();
         $categories = $category->getCompanyGroupCategories($request->all());
 
@@ -244,213 +232,174 @@ class ReportController extends Controller
         })->first();
 
         $photoSelectionOptions = $categories->map(function ($item, $key) use ($selectedPhotoSelections) {
-            
-            //Noman
-            
-            $matchedCat = collect($selectedPhotoSelections->options)->where('id', $item->id)->first();
-            // $selected = $matchedCat ? $matchedCat->selected : false; // Ensure selected is set to false if not found
-            $result = [
+            $matchedCat = collect($selectedPhotoSelections->options ?? [])->where('id', $item->id)->first();
+            return [
                 'id' => $item->id,
                 'title' => title_case($item->name),
-                'selected' => $matchedCat->selected ?: FALSE,
-                // 'selected' => $selected, // Use the selected value or default to false
+                'selected' => $matchedCat->selected ?? FALSE,
             ];
-            return $result;
         })->values()->toArray();
-        
+
         $options->push([
-                           'key' => "photo_selections",
-                           'title' => "Photo Selection",
-                           'type' => "checkbox",
-                           'rules' => $rules,
-                           'options' => $photoSelectionOptions
-                       ]);
-        //</editor-fold>
+            'key' => "photo_selections",
+            'title' => "Photo Selection",
+            'type' => "checkbox",
+            'rules' => $rules,
+            'options' => $photoSelectionOptions
+        ]);
 
-        $estimatesAreas = [];
         $estimatesAreas = $categories->filter(function ($item, $key) {
-            if (!in_array($item->type, [1,3])) {
-                return true;
-            }
-            return false;
+            return !in_array($item->type, [1, 3]);
         });
-
-        //<editor-fold desc="Estimates">
 
         $selectedEstimates = $lastSelectedOptions->filter(function ($item) {
             return $item->key == 'estimates';
         })->first();
 
         $estimateOptions = $estimatesAreas->map(function ($item, $key) use ($selectedEstimates) {
-
-            $matchedEst = collect($selectedEstimates->options)->where('id', $item->id)->first();
-            $result = [
+            $matchedEst = collect($selectedEstimates->options ?? [])->where('id', $item->id)->first();
+            return [
                 'id' => $item->id,
                 'title' => title_case($item->name . " Estimate"),
-                'selected' => $matchedEst->selected ?: FALSE,
+                'selected' => $matchedEst->selected ?? FALSE,
             ];
-            return $result;
-
         })->values();
 
-//        \Log::debug("".print_r([
-//                                   '$estimateOptions' =>$estimateOptions->toArray()
-//                               ],1));
-
         $options->push([
-                           'key' => "estimates",
-                           'title' => "Estimates",
-                           'type' => "checkbox",
-                           'dependent' => "photo_selections",
-                           'options' => $estimateOptions
-                       ]);
-        //</editor-fold>
+            'key' => "estimates",
+            'title' => "Estimates",
+            'type' => "checkbox",
+            'dependent' => "photo_selections",
+            'options' => $estimateOptions
+        ]);
 
         $options->push($pageBreak);
 
-        //<editor-fold desc="Breakdown">
-        $breakdownOptions = collect(
-            [
-                'units_of_measure' => FALSE,
-                'material_cost' => FALSE,
-                'labor_cost' => FALSE,
-                'equipment_cost' => FALSE,
-                'supervision_cost' => FALSE,
-                'margin_%' => FALSE,
-                'sales_tax' => FALSE,
-                'line_item_total' => FALSE,
-            ]
-        );
+        $breakdownOptions = collect([
+            'units_of_measure' => FALSE,
+            'material_cost' => FALSE,
+            'labor_cost' => FALSE,
+            'equipment_cost' => FALSE,
+            'supervision_cost' => FALSE,
+            'margin_%' => FALSE,
+            'sales_tax' => FALSE,
+            'line_item_total' => FALSE,
+        ]);
 
         $selectedBreakdowns = $lastSelectedOptions->filter(function ($item) {
             return $item->key == 'breakdown';
         })->first();
 
         $breakdownOptions = $breakdownOptions->map(function ($item, $key) use ($selectedBreakdowns) {
-            $matched = collect($selectedBreakdowns->options)->where('key', $key)->first();
+            $matched = collect($selectedBreakdowns->options ?? [])->where('key', $key)->first();
             return [
                 'id' => $key,
                 'title' => title_case(str_replace('_', ' ', $key)),
                 'type' => "checkbox",
-                'selected' => $matched->selected ?: false
+                'selected' => $matched->selected ?? false
             ];
         })->values();
 
         $options->push([
-                           'key' => "breakdown",
-                           'title' => "Report Column Selection",
-                           'type' => "checkbox",
-                           'options' => $breakdownOptions
-                       ]);
-        //</editor-fold>
+            'key' => "breakdown",
+            'title' => "Report Column Selection",
+            'type' => "checkbox",
+            'options' => $breakdownOptions
+        ]);
 
         $options->push($pageBreak);
 
-        //<editor-fold desc="Trade Items">
         $selectedTradeItems = $lastSelectedOptions->filter(function ($item) {
             return $item->key == 'trade_items';
         })->first();
 
         $selectedTradeItems = $estimatesAreas->map(function ($item, $key) use ($selectedTradeItems) {
-
-            $matchedTrade = collect($selectedTradeItems->options)->where('id', $item->id)->first();
-            $result = [
+            $matchedTrade = collect($selectedTradeItems->options ?? [])->where('id', $item->id)->first();
+            return [
                 'id' => $item->id,
                 'title' => title_case($item->name),
-                'selected' => $matchedTrade->selected ?: FALSE,
+                'selected' => $matchedTrade->selected ?? FALSE,
             ];
-            return $result;
-
         })->values();
 
-
         $options->push([
-                           'key' => "trade_items",
-                           'title' => "Trade Items",
-                           'type' => "checkbox",
-                           'dependent' => "estimates",
-                           'options' => $selectedTradeItems ?: [],
-                       ]);
-
-        //</editor-fold>
-
-        //<editor-fold desc="Section Items">
+            'key' => "trade_items",
+            'title' => "Trade Items",
+            'type' => "checkbox",
+            'dependent' => "estimates",
+            'options' => $selectedTradeItems ?: [],
+        ]);
 
         $selectedSectionItems = $lastSelectedOptions->filter(function ($item) {
             return $item->key == 'section_items';
         })->first();
 
-        $sectionItemPrice = $ownAuthorization['section_item']['price'];
-        $sectionItems = collect($ownAuthorization['section_item']['item'])->map(
+        $sectionItemPrice = $ownAuthorization['section_item']['price'] ?? [];
+        $sectionItems = collect($ownAuthorization['section_item']['item'] ?? [])->map(
             function ($el, $index) use ($sectionItemPrice, $selectedSectionItems) {
-                $matchedOption = collect($selectedSectionItems->options)->where('id', $index + 1)->first();
-                return ['id' => $index + 1,
+                $matchedOption = collect($selectedSectionItems->options ?? [])->where('id', $index + 1)->first();
+                return [
+                    'id' => $index + 1,
                     'title' => $el,
-                    'price' => $sectionItemPrice[$index],
-                    'selected' => $matchedOption->selected ?: false,
+                    'price' => $sectionItemPrice[$index] ?? 0,
+                    'selected' => $matchedOption->selected ?? false,
                     'has_qty' => true,
-                    'value' => $matchedOption->value ?: null,
+                    'value' => $matchedOption->value ?? null,
                 ];
             }
         );
 
         if (!empty($sectionItems->toArray())) {
             $options->push([
-                               'key' => "section_items",
-                               'title' => "Optional Upgrades",
-                               'type' => "checkbox",
-                               'options' => $sectionItems
-                           ]);
+                'key' => "section_items",
+                'title' => "Optional Upgrades",
+                'type' => "checkbox",
+                'options' => $sectionItems
+            ]);
         }
-        //</editor-fold>
 
-        //<editor-fold desc="Item Options">
         $selectedItemOptions = $lastSelectedOptions->filter(function ($item) {
             return $item->key == 'item_options';
         })->first();
 
-        $itemOptions = collect($ownAuthorization['item_option'])->map(
+        $itemOptions = collect($ownAuthorization['item_option'] ?? [])->map(
             function ($el, $index) use ($selectedItemOptions) {
-                $matchedOption = collect($selectedItemOptions->options)->where('id', $index + 1)->first();
-                return ['id' => $index + 1,
+                $matchedOption = collect($selectedItemOptions->options ?? [])->where('id', $index + 1)->first();
+                return [
+                    'id' => $index + 1,
                     'title' => $el,
-                    'value' => $matchedOption->value ?: '',
+                    'value' => $matchedOption->value ?? '',
                 ];
             }
         );
 
         if (!empty($itemOptions->toArray())) {
             $options->push([
-                               'key' => "item_options",
-                               'title' => "Options",
-                               'type' => "text",
-                               'options' => $itemOptions
-                           ]);
+                'key' => "item_options",
+                'title' => "Options",
+                'type' => "text",
+                'options' => $itemOptions
+            ]);
         }
-        //</editor-fold>
 
-        //<editor-fold desc="Special Instruction">
         $selectedSpecialInstruction = $lastSelectedOptions->filter(function ($item) {
             return $item->key == 'special_instruction';
         })->first();
 
         $options->push([
-                           'key' => "special_instruction",
-                           'title' => "Special Instruction",
-                           'type' => "text_area",
-                           'value' => $selectedSpecialInstruction->value ?: ""
-
-                       ]);
-        //</editor-fold>
+            'key' => "special_instruction",
+            'title' => "Special Instruction",
+            'type' => "text_area",
+            'value' => $selectedSpecialInstruction->value ?? ""
+        ]);
 
         $options->push($pageBreak);
 
-        $templates = ReportTemplate::selectRaw("id,title,identifier,'false' AS selected")->where(
-            ['company_id' => $request['company_id']]
-        )->whereNull('deleted_at')->get();
+        $templates = ReportTemplate::selectRaw("id,title,identifier,'false' AS selected")
+            ->where(['company_id' => $request['company_id']])
+            ->whereNull('deleted_at')
+            ->get();
 
-
-        //<editor-fold desc="Introduction">
         $selectedIntroduction = $lastSelectedOptions->filter(function ($item) {
             return $item->key == 'introduction';
         })->first();
@@ -459,40 +408,33 @@ class ReportController extends Controller
             return $item->identifier == 'introduction';
         });
 
-
         if ($introduction->isNotEmpty()) {
             $options->push([
-                               'key' => "introduction",
-                               'title' => "Introduction",
-                               'type' => "toggle",
-                               'selected' => $selectedIntroduction->selected ?: false
-                           ]);
+                'key' => "introduction",
+                'title' => "Introduction",
+                'type' => "toggle",
+                'selected' => $selectedIntroduction->selected ?? false
+            ]);
         }
 
-        //</editor-fold>
-
-        //<editor-fold desc="Documents">
         $selectedDocuments = $lastSelectedOptions->filter(function ($item) {
             return $item->key == 'documents';
         })->first();
 
-        $documents = $templates->where('identifier','documents')->values()->map(function ($docItem) use ($selectedDocuments) {
-            $matchedDocs = collect($selectedDocuments->options)->where('id', $docItem->id)->first();
-
-            $docItem->selected = $matchedDocs->selected ?: FALSE;
+        $documents = $templates->where('identifier', 'documents')->values()->map(function ($docItem) use ($selectedDocuments) {
+            $matchedDocs = collect($selectedDocuments->options ?? [])->where('id', $docItem->id)->first();
+            $docItem->selected = $matchedDocs->selected ?? FALSE;
             return $docItem;
         });
 
         if ($documents->isNotEmpty()) {
             $options->push([
-                               'key' => "documents",
-                               'title' => "Documents",
-                               'type' => "checkbox",
-                               'options' => $documents
-                           ]);
+                'key' => "documents",
+                'title' => "Documents",
+                'type' => "checkbox",
+                'options' => $documents
+            ]);
         }
-
-        //</editor-fold>
 
         if ($companyReport->is_disclaimer) {
             $selectedDisclaimer = $lastSelectedOptions->filter(function ($item) {
@@ -500,17 +442,15 @@ class ReportController extends Controller
             })->first();
 
             $options->push([
-                               'key' => "credit_disclaimer",
-                               'title' => "Credit Disclaimer",
-                               'type' => "toggle",
-                               'selected' => $selectedDisclaimer->selected ?: false,
-                           ]);
+                'key' => "credit_disclaimer",
+                'title' => "Credit Disclaimer",
+                'type' => "toggle",
+                'selected' => $selectedDisclaimer->selected ?? false,
+            ]);
         }
 
-
-        //<editor-fold desc="Terms Condition">
         $termsCondition = $templates->filter(function ($item, $key) {
-            return $key == 'terms_conditions';
+            return $item->identifier == 'terms_conditions';
         });
 
         $selectedTerms = $lastSelectedOptions->filter(function ($item) {
@@ -519,14 +459,12 @@ class ReportController extends Controller
 
         if ($termsCondition->isNotEmpty()) {
             $options->push([
-                               'key' => "terms_conditions",
-                               'title' => "Terms & Conditions",
-                               'type' => "toggle",
-                               'selected' => $selectedTerms->selected ?: false,
-                           ]);
+                'key' => "terms_conditions",
+                'title' => "Terms & Conditions",
+                'type' => "toggle",
+                'selected' => $selectedTerms->selected ?? false,
+            ]);
         }
-        //</editor-fold>
-
 
         return $this->__sendResponse('Tag', $options->toArray(), 200, 'Tag list retrieved successfully.');
     }
@@ -720,47 +658,24 @@ class ReportController extends Controller
 
     public function createReport_v3(Request $request, $projectId)
     {
-//        die("SURvey tak format sahi hogya ha. Ab aage ki method jo call ho rhe hen generateWebReport me, wo dikhne hen");
-
         try {
             if ($request->test) {
-                /** Test Mode: Autofill 'optionsRequest' AND $user object */
                 $request['user-token'] = "670b4fa5948639577b80812b6d46b953";
                 $this->optionsRequest = json_decode($this->optionsRequest, true);
-                // $this->optionsRequest = $options;
                 $user = User::where(['token' => $request->header('user-token')])->first();
             } else {
                 $user = User::where(['id' => $request['user_id']])->first();
                 $this->optionsRequest = collect($request['request_options']);
-
-                // $this->ownerAuthorization = $request['request_options']['owner_authorization'];
             }
 
-            $requestOptions = collect($request->request_options);
-
-            $this->photoSelection = $this->optionsRequest->where('key','photo_selections')
-                ->first()['options'];
-
-            $this->estimates = $this->optionsRequest->where('key','estimates')
-                ->first()['options'];
-
-            $this->breakdown = $this->optionsRequest->where('key','breakdown')
-                ->first()['options'];
-
-            $tradeItems = $this->optionsRequest->where('key','trade_items')
-                ->first()['options'];
-
-            $sectionItems = $this->optionsRequest->where('key','section_items')
-                ->first()['options'];
-
-            $itemOptions = $this->optionsRequest->where('key','item_options')
-                ->first()['options'];
-
-            $specialInstruction = $this->optionsRequest->where('key','special_instruction')
-                ->first()['value'];
-
-            $isCreditDisclaimer = $this->optionsRequest->where('key','credit_disclaimer')
-                ->first()['selected'];
+            $this->photoSelection = $this->optionsRequest->where('key', 'photo_selections')->first()['options'] ?? [];
+            $this->estimates = $this->optionsRequest->where('key', 'estimates')->first()['options'] ?? [];
+            $this->breakdown = $this->optionsRequest->where('key', 'breakdown')->first()['options'] ?? [];
+            $tradeItems = $this->optionsRequest->where('key', 'trade_items')->first()['options'] ?? [];
+            $sectionItems = $this->optionsRequest->where('key', 'section_items')->first()['options'] ?? [];
+            $itemOptions = $this->optionsRequest->where('key', 'item_options')->first()['options'] ?? [];
+            $specialInstruction = $this->optionsRequest->where('key', 'special_instruction')->first()['value'] ?? '';
+            $isCreditDisclaimer = $this->optionsRequest->where('key', 'credit_disclaimer')->first()['selected'] ?? false;
 
             $this->ownerAuthorization = [
                 'section_items' => $sectionItems,
@@ -770,111 +685,45 @@ class ReportController extends Controller
                 'categories' => $tradeItems,
             ];
 
-//            \Log::debug("createReport_v3".print_r([
-//                                                      '$request->all(' => $request->all(),
-//                                                      'photoSelection' => $this->photoSelection,
-//                                                      'estimates' => $this->estimates,
-//                                                      '$tradeItems' => $tradeItems,
-//                                                      '$sectionItems' => $sectionItems,
-//                                                      '$itemOptions' => $itemOptions,
-//                                                      '$specialInstruction' => $specialInstruction,
-//                                                      '$isCreditDisclaimer' => $isCreditDisclaimer,
-//                                                  ],1));
-
-            //<editor-fold desc="Meet work shouldn't be used 03-Jan-2024">
-            if (!empty($sectionItems) && !empty($itemOptions)) {
-                $items = [];
-                $qty = [];
-                $price = [];
-                $total = [];
-                $item_options = [];
-                foreach ($sectionItems as $selectd_items) {
-                    array_push($items, $selectd_items['title']);
-                    $getqty = (string)number_format($selectd_items['qty']);
-                    $getprice = (string)number_format($selectd_items['price'], 2, '.', '');
-                    $gettotal = (string)number_format($selectd_items['total'], 2, '.', '');
-                    array_push($qty, $getqty);
-                    array_push($price, $getprice);
-                    array_push($total, $gettotal);
-                }
-
-                foreach ($itemOptions as $item_option) {
-                    array_push($item_options, $item_option['name']);
-                }
-
-                //            $new_data = (object)[];
-                //            $new_data->section_item = (object)[];
-                //            $new_data->section_item->item = $items;
-                //            $new_data->section_item->qty = $qty;
-                //            $new_data->section_item->price = $price;
-                //            $new_data->section_item->total = $total;
-                //            $new_data->item_option = $item_options;
-                //            $new_data = json_encode($new_data);
-                //            $crdata = CompanyReport::where(['company_id' => $request['company_id']])->first();
-                //            $crdata->json_data = $new_data;
-                //            $crdata->save();
-            }
-            //</editor-fold>
-
-
             $this->report = Report::firstOrNew(['project_id' => $projectId]);
-            //<editor-fold desc="Returning Previously Built PDF link">
-            if ($this->report->exists && empty($request->request_options)) {
 
+            if ($this->report->exists && empty($request->request_options)) {
                 $this->__collection = false;
                 $this->__is_paginate = false;
-                return $this->__sendResponse(
-                    'Report',
-                    ['url' => url($this->report['path'])],
-                    200,
-                    'Report Fetched Successfully'
-                );
+                return $this->__sendResponse('Report', ['url' => url($this->report['path'])], 200, 'Report Fetched Successfully');
             } else if (empty($request->request_options)) {
-                return $this->__sendError(
-                    "Report Not Found",
-                    ['message' => "You haven't create any report for the project"],
-                    400
-                );
+                return $this->__sendError("Report Not Found", ['message' => "You haven't create any report for the project"], 400);
             }
-            //</editor-fold>
-
 
             if ($this->report->exists) {
-                /** Already Exist */
                 $request['user_id'] = $this->report->user_id;
                 $this->report->options = json_encode($this->optionsRequest);
-
                 if (!$request->update_report) {
-                    /** Set to Null If only we're not updating the report from sign process */
                     $this->report->inspector_sign = NULL;
                     $this->report->inspector_sign_at = NULL;
-                    $this->report->customer_sign = NULL; // We should delete the sign image
+                    $this->report->customer_sign = NULL;
                     $this->report->customer_sign_at = NULL;
                 }
-
             } else {
-                /** IF NEW */
                 $this->report->token = "report-" . uniqid() . "-" . time();
                 $this->report->user_id = $request['user_id'];
                 $this->report->options = json_encode($this->optionsRequest);
             }
+
             ini_set('memory_limit', '512M');
             $this->userDetails = $user;
+
             if (count((array)$user) < 1) {
                 $this->__is_ajax = true;
-                return $this->__sendError(
-                    'This user token is invalid.',
-                    [['auth' => 'This user token is invalid.']],
-                    200
-                );
+                return $this->__sendError('This user token is invalid.', [['auth' => 'This user token is invalid.']], 200);
             }
+
             $request['user_id'] = $user['id'];
             $request['company_id'] = $user['company_id'];
             $request['company_group_id'] = $user['company_group_id'];
             $request['project_id'] = $projectId;
 
             if ($request['test'] != true) {
-                //<editor-fold desc="Basic Validation">
                 $params = $request->all();
                 $params['owner_authorization'] = $this->ownerAuthorization;
 
@@ -882,123 +731,53 @@ class ReportController extends Controller
                 $param_rules['user_id'] = 'required|int';
                 $param_rules['company_id'] = 'required|int';
                 $param_rules['company_group_id'] = 'required|int';
-                $param_rules['project_id'] = [
-                    'required',
-                    'int',
-                    Rule::exists('project', 'id')->whereNull('deleted_at'),
-                ];
+                $param_rules['project_id'] = ['required', 'int', Rule::exists('project', 'id')->whereNull('deleted_at')];
                 $param_rules['owner_authorization'] = 'nullable|array';
 
                 $this->__is_ajax = true;
                 $response = $this->__validateRequestParams($params, $param_rules);
                 if ($this->__is_error == true)
                     return $response;
-                //</editor-fold>
 
-                //<editor-fold desc="Detailed Validation">
-                $validatingParams = [
-                    'photo_selection' => $this->photoSelection,
-                    'estimates' => $this->estimates
-                ];
+                $validatingParams = ['photo_selection' => $this->photoSelection, 'estimates' => $this->estimates];
+                $detailed_rules['photo_selection.*.id'] = ['required', Rule::exists('category', 'id')->where('company_id', $request['company_id'])->where(function ($q) {
+                    $q->whereNull('deleted_at');
+                })];
+                $detailed_rules['estimates.*.id'] = ['required', Rule::exists('category', 'id')->where('company_id', $request['company_id'])->where(function ($q) {
+                    $q->whereNull('deleted_at');
+                })];
 
-                $detailed_rules['photo_selection.*.id'] = [
-                    'required',
-                    Rule::exists('category','id')
-                        ->where('company_id',$request['company_id'])
-                        ->where(function($q){
-                            $q->whereNull('deleted_at');
-                        })
-
-                ];
-
-                $detailed_rules['estimates.*.id'] = [
-                    'required',
-                    Rule::exists('category','id')
-                        ->where('company_id',$request['company_id'])
-                        ->where(function($q){
-                            $q->whereNull('deleted_at');
-                        })
-
-                ];
-
-                $response = $this->__validateRequestParams($validatingParams,$detailed_rules);
-                if($this->__is_error == true)
+                $response = $this->__validateRequestParams($validatingParams, $detailed_rules);
+                if ($this->__is_error == true)
                     return $response;
-                //</editor-fold>
             }
-
-
-            //<editor-fold desc="Setting $this->companyTemplates">
 
             $identifiers = collect([]);
             $selectedIds = [];
 
-            $identifiers[] = $this->optionsRequest
-                ->whereIn('key',['introduction','terms_conditions' ])
-                ->where('selected', true)->pluck('key');
-
-            $documents = $this->optionsRequest->where('key','documents')->first()['options'];
-
-            // $selectedIntro = collect($introduction)->where('selected', 'true')->pluck('key')->toArray(); // no need cuz only one intro in web-panel
-            $selectedDocs = collect($documents)->where('selected',true)->pluck('id')->toArray();
+            $identifiers[] = $this->optionsRequest->whereIn('key', ['introduction', 'terms_conditions'])->where('selected', true)->pluck('key');
+            $documents = $this->optionsRequest->where('key', 'documents')->first()['options'] ?? [];
+            $selectedDocs = collect($documents)->where('selected', true)->pluck('id')->toArray();
             $selectedIds = array_merge($selectedDocs);
             $params = ['company_id' => $request['company_id'], 'ids' => $selectedIds, 'identifiers' => collect($identifiers)->flatten()];
             $reportTemplates = new ReportTemplate();
             if (!empty($params['ids']) || !empty($params['identifiers'])) {
                 $this->companyTemplates = $reportTemplates->getSelectedTemplates($params);
             }
-            //</editor-fold>
 
-            //<editor-fold desc="Setting $this->companyDetails">
             $this->companyDetails = CompanyReport::where(['company_id' => $request['company_id']])->first();
             $this->companyDetails->logo_path = url("uploads/report_templates/" . $this->companyDetails->logo_path);
-            $this->companyDetails->report_cover_image = url(
-                "uploads/report_templates/" . $this->companyDetails->report_cover_image
-            );
+            $this->companyDetails->report_cover_image = url("uploads/report_templates/" . $this->companyDetails->report_cover_image);
             $this->companyDetails->json_data = json_decode($this->companyDetails->json_data, true);
 
             if (empty($tradeItems)) {
                 $this->companyDetails->json_data = NULL;
             }
-            //</editor-fold>
 
-
-//            if ($isCreditDisclaimer && $this->companyDetails->is_disclaimer && !empty($this->companyDetails->credit_disclaimer)) {
-//                $this->ownerAuthorization['credit_disclaimer'] = $this->companyDetails->credit_disclaimer;
-//            }
-
-
-            //<editor-fold desc="Where clause mapping">
-            $whereClauses = ['whereCategory' => [], /*'whereSurvey' => [],*/
-                'whereEstimates' => []];
-            /**Just lowering cases*/
-
-            $this->optionsRequest['breakdown'] =
-                collect($this->breakdown)->mapWithKeys(function ($item, $key) {
-                    return [$item['key'] => $item['selected']];
-                });
-
-
-//            foreach ($this->photoSelection as $key => $item) {
-//                if ($item['selected']) {
-//                    $whereClauses['whereCategory'][] = $item['id'];
-//
-//                }
-//                            if ($item['survey']) {
-//                                $whereClauses['whereSurvey'][] = $item['id'];
-//                            }
-//                            Commented on Jan-2023
-//                            if ($item['Estimates']) {
-//                                $whereClauses['whereEstimates'][$item['id']] = $this->optionsRequest['breakdown'];
-//                            }
-//            }
-
-//            foreach ($this->estimates as $key => $item) {
-//                if ($item['selected']) {
-//                    $whereClauses['whereEstimates'][$item['id']] = $this->optionsRequest['breakdown'];
-//                }
-//            }
-            //</editor-fold>
+            $whereClauses = ['whereCategory' => [], 'whereEstimates' => []];
+            $this->optionsRequest['breakdown'] = collect($this->breakdown)->mapWithKeys(function ($item, $key) {
+                return [$item['key'] => $item['selected']];
+            });
 
             return $this->generateWebReport($request->all());
         } catch (\Mpdf\MpdfException $e) {
@@ -1008,7 +787,7 @@ class ReportController extends Controller
                     return str_contains($value['file'], '/app/');
                 })->values(),
                 'line' => $e->getLine(),
-            ],                        $e->getCode() ?: 400);
+            ], $e->getCode() ?: 400);
         } catch (\Exception $e) {
             \Log::debug("Exception: " . $e->getMessage());
             return $this->__sendError("Exception: " . $e->getMessage(), [
@@ -1016,83 +795,61 @@ class ReportController extends Controller
                     return str_contains($value['file'], '/app/');
                 })->values(),
                 'line' => $e->getLine(),
-            ],                        $e->getCode() ?: 400);
+            ], $e->getCode() ?: 400);
         } catch (\Throwable $t) {
             \Log::debug("Throwable: " . $t->getMessage());
             return $this->__sendError("Throwable: " . $t->getMessage(), [
-//                'file' => collect($t->getTrace())->filter(function ($value, $key) {
-//                    return str_contains($value['file'], '/app/');
-//                })->values(),
                 'line' => $t->getLine(),
-            ],                        $t->getCode());
+            ], $t->getCode());
         }
     }
 
 
     public function generateWebReport($request)
     {
-        /** All cats incase of need to show unselected categories*/
-
         $titles = [
             'additional_photos' => 'Additional Photos',
             'required_category' => 'Included Photos',
             'damaged_category' => 'Inspection Areas',
         ];
 
-
-        $photoSelectionIds = collect($this->photoSelection)->where('selected',true)->pluck('id');
-
-        /** This Query was required cuz request params doesn't provider photo-view id
-         *  and project_media refers (foreign-key) to photo-view ONLY
-         */
-        $areasWithParent = Category::whereIn('id',$photoSelectionIds)->orWhereIn('parent_id',$photoSelectionIds)
-            ->get(['id','parent_id']);
-
+        $photoSelectionIds = collect($this->photoSelection)->where('selected', true)->pluck('id');
+        $areasWithParent = Category::whereIn('id', $photoSelectionIds)->orWhereIn('parent_id', $photoSelectionIds)
+            ->get(['id', 'parent_id']);
         $photoSelectionIds = $areasWithParent->pluck('id');
-
-
-//        dd(
-//            'this->ownerAuthorization[categories]',$this->ownerAuthorization['categories'],
-//            '$areasWithParent',$areasWithParent->groupBy('parent_id')->toArray(),
-////            '$areasWithParent',$areasWithParent->pluck('parent_id'),
-//            '$photoSelectionIds',$photoSelectionIds,
-//        );
-
-
 
         $project = Project::with([
             'assigned_user',
-            'project_media' => function($q) use($photoSelectionIds){
+            'project_media' => function ($q) use ($photoSelectionIds) {
                 $q->whereIn('project_media.target_id', $photoSelectionIds);
             },
             'project_media.tags',
-                                  'project_media.tags.uom','project_media.target','project_media.target.parent',
-                                  'project_survey','project_survey.category',
-                              ])
-            ->where(['id' => $request['project_id']])->first();
+            'project_media.tags.uom',
+            'project_media.target',
+            'project_media.target.parent',
+            'project_survey',
+            'project_survey.category',
+        ])->where(['id' => $request['project_id']])->first();
+
+        if (!$project) {
+            \Log::error("Project not found for ID: " . $request['project_id']);
+            return $this->__sendError("Project not found", [], 404);
+        }
 
         $this->projectDetails = array_except(
             $project->toArray(),
-            ['last_crm_sync_at',
-                'project_media',
-                'categories',
-                'get_single_media',
-                'complete_address',
-                'company']
+            ['last_crm_sync_at', 'project_media', 'categories', 'get_single_media', 'complete_address', 'company']
         );
 
-        $this->projectDetails['assigned_user']['mobile_no'] = substr($this->projectDetails['assigned_user']['mobile_no'],0,-7).'-'.
-            substr($this->projectDetails['assigned_user']['mobile_no'],-7,3).'-'.
-            substr($this->projectDetails['assigned_user']['mobile_no'],-4);
-
+        $this->projectDetails['assigned_user']['mobile_no'] = substr($this->projectDetails['assigned_user']['mobile_no'], 0, -7) . '-' .
+            substr($this->projectDetails['assigned_user']['mobile_no'], -7, 3) . '-' .
+            substr($this->projectDetails['assigned_user']['mobile_no'], -4);
         $this->projectDetails['latitude'] = round($this->projectDetails['latitude'], 7);
         $this->projectDetails['longitude'] = round($this->projectDetails['longitude'], 7);
         $this->projectDetails['inspection_date'] = date("m/d/Y", strtotime($this->projectDetails['inspection_date']));
 
-        //<editor-fold desc="Custom Fonts">
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
-
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
@@ -1103,151 +860,100 @@ class ReportController extends Controller
             'BI' => 'EuclidSquare-BoldItalic.ttf'
         ];
 
-        /*
-            EuclidSquare-Bold.ttf
-            EuclidSquare-BoldItalic.ttf
-            EuclidSquare-Italic.ttf
-            EuclidSquare-Light.ttf
-            EuclidSquare-LightItalic.ttf
-            EuclidSquare-Medium.ttf
-            EuclidSquare-MediumItalic.ttf
-            EuclidSquare-Regular.ttf
-            EuclidSquare-SemiBold.ttf
-            EuclidSquare-SemiBoldItalic.ttf
-
-            Poppins-Regular.ttf
-            Poppins-Italic.ttf
-            Poppins-Bold.ttf
-            Poppins-BoldItalic.ttf
-
-
-            Poppins-Black.ttf
-            Poppins-BlackItalic.ttf
-            Poppins-Bold.ttf
-            Poppins-BoldItalic.ttf
-            Poppins-ExtraBold.ttf
-            Poppins-ExtraBoldItalic.ttf
-            Poppins-ExtraLight.ttf
-            Poppins-ExtraLightItalic.ttf
-            Poppins-Italic.ttf
-            Poppins-Light.ttf
-            Poppins-LightItalic.ttf
-            Poppins-Medium.ttf
-            Poppins-MediumItalic.ttf
-            Poppins-Regular.ttf
-            Poppins-SemiBold.ttf
-            Poppins-SemiBoldItalic.ttf
-            Poppins-Thin.ttf
-            Poppins-ThinItalic.ttf
-         */
-
         $poppinsFonts = [
-            'R' =>  'Poppins-Regular.ttf',
-            'I' =>  'Poppins-Italic.ttf',
-            'B' =>  'Poppins-SemiBold.ttf',
+            'R' => 'Poppins-Regular.ttf',
+            'I' => 'Poppins-Italic.ttf',
+            'B' => 'Poppins-SemiBold.ttf',
             'BI' => 'Poppins-SemiBoldItalic.ttf',
         ];
 
-
         $euclidsquareFontDir = public_path('/assets/fonts/report-font/euclidsquare');
         $poppinsFontDir = public_path('/assets/fonts/report-font/Poppins');
-        //</editor-fold>
-
 
         $this->mpdf = new \Mpdf\Mpdf([
-                                         'mode' => 'utf-8',
-//            'basepath' => 'google.com',
-                                         'debug' => true,
-                                         'format' => 'A4',
-                                         'default_font_size' => 10,
-                                         'default_font_color' => 'black',
-                                         'default_font' => 'poppins',
-                                         'margin' => 0,
-                                         'defaultPageNumStyle' => '1',
-                                         'fontDir' =>  array_merge($fontDirs, [$euclidsquareFontDir,$poppinsFontDir]),
-                                         'fontdata' => collect($fontData)
-                                             ->prepend($euclidSquareFonts,'euclidsquare')
-                                             ->prepend($poppinsFonts,'poppins')
-                                             ->toArray()
-                                     ]);
+            'mode' => 'utf-8',
+            'debug' => true,
+            'format' => 'A4',
+            'default_font_size' => 10,
+            'default_font_color' => 'black',
+            'default_font' => 'poppins',
+            'margin' => 0,
+            'defaultPageNumStyle' => '1',
+            'fontDir' => array_merge($fontDirs, [$euclidsquareFontDir, $poppinsFontDir]),
+            'fontdata' => collect($fontData)
+                ->prepend($euclidSquareFonts, 'euclidsquare')
+                ->prepend($poppinsFonts, 'poppins')
+                ->toArray()
+        ]);
 
-
-
-        //$this->mpdf->SetDefaultBodyCSS('background-color', "red");
-
-//        $this->mpdf->showImageErrors = true;
         $this->mpdf->useActiveForms = true;
-
-//        $this->mpdf->formUseZapD = true;
-//        $this->mpdf->form_border_color = '0.6 0.6 0.72';
-//        $this->mpdf->form_button_border_width = '2';
-//        $this->mpdf->form_button_border_style = 'S';
-//        $this->mpdf->form_radio_color = '#619eff'; 	// radio and checkbox
-//        $this->mpdf->form_radio_background_color = '#242424';
-
         $this->mpdf->SetTitle($this->projectDetails['name']);
-
 
         $this->coverPage();
 
         $url = url("image/report/bg.png");
-//        $url = url("image/report/card-1.png");
         $this->mpdf->SetDefaultBodyCSS('background', "url('$url')");
         $this->mpdf->SetDefaultBodyCSS('background-image-resize', "3");
 
         $this->companyIntroduction();
-        //Merge Additional Document
-        $this->additionalDocuments();
+
+        $documents = $this->optionsRequest->where('key', 'documents')->first();
+        if ($documents && collect($documents['options'])->where('selected', true)->isNotEmpty()) {
+            $this->additionalDocuments();
+        }
+
         $this->fourImagesTemplate($project->project_media);
         $this->surveyTemplate($project->project_survey);
         $this->estimatesTemplate($project->project_media);
-//        $this->addDocuments();
 
-
-
-        $this->totalPages =  count($this->mpdf->pages);
+        $this->totalPages = count($this->mpdf->pages);
         $this->mpdf->SetTitle($project['name']);
 
-        /**######################## To Save File and then show via URL ########################*/
-        //<editor-fold desc="To Save File and then show via URL">
         $fileName = 'project_report_' . $project['id'] . '.pdf';
-
         $reportPath = public_path(config('constants.PDF_PATH') . $fileName);
         $reportUrl = (env('BASE_URL') . config('constants.PDF_PATH') . $fileName);
 
         $this->report->path = config('constants.PDF_PATH') . $fileName;
         $this->report->save();
 
-        //<editor-fold desc="Comment this block to stop saving the output to a file and returning its url as response">
-
         $this->mpdf->Output($reportPath, 'F');
 
         if ($request['update_report']) {
-            /** update_report is used ONLY when customer signs and we need to update the report without response*/
             return true;
         }
+
         $this->__collection = false;
         $this->__is_paginate = false;
-        return $this->__sendResponse('Report', ['url' => $reportUrl], 200, 'Report Created Succesfully');
-
-        //</editor-fold>
-
-        //</editor-fold>
-
-        /** ######################## To real-time output (useful for debugging) ########################*/
-        return response($this->mpdf->Output("test", "I"), 200)->header('Content-Type', 'application/pdf');
+        return $this->__sendResponse('Report', ['url' => $reportUrl], 200, 'Report Created Successfully');
     }
 
     //Noman Ali Merge Additional Documents
     public function additionalDocuments()
     {
-        $companyId = $this->projectDetails['company_id']; // Retrieve the company ID from the project details
-        $documents = $this->getDocuments($companyId);
+        $selectedDocs = collect($this->optionsRequest->where('key', 'documents')->first()['options'] ?? [])
+            ->where('selected', true);
+
+        if ($selectedDocs->isEmpty()) {
+            return;
+        }
+
+        $companyId = $this->projectDetails['company_id'];
+        $documentIds = $selectedDocs->pluck('id')->toArray();
+        $documents = ReportTemplate::where('company_id', $companyId)
+            ->where('identifier', 'documents')
+            ->whereIn('id', $documentIds)
+            ->get();
 
         foreach ($documents as $document) {
-            $this->mpdf->SetSourceFile($document['path']);
-            $tplIdx = $this->mpdf->ImportPage(1);
-            $this->mpdf->UseTemplate($tplIdx);
+            $path = base_path("public/{$document->path}");
+            if (file_exists($path)) {
+                $this->mpdf->AddPage('', '', '', '', '', 15, 15, 30, 30, 0, 0);
+                $this->mpdf->SetSourceFile($path);
+                $tplIdx = $this->mpdf->ImportPage(1);
+                $this->mpdf->UseTemplate($tplIdx);
+            } else {
+                \Log::warning("Document file not found: " . $path);
+            }
         }
     }
 
