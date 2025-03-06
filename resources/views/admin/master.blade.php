@@ -121,91 +121,68 @@ else{
 @stack("page_js")
 
 <script>
-    // var limit = $('#card-container').attr('data-limit').val();
-    var limit = $("#card-container").each( function () {
-        $(this).val( $(this).attr("data-limit") );
-        console.log($(this).val());
-    });
-    var itemsPerPage = limit[0].value;
+    // Get the limit from data-limit attribute (simplified)
+    var limit = parseInt($('#card-container').attr('data-limit')); // Convert to integer
+    var itemsPerPage = limit; // Use it directly
     var filteredItems = $('.record-item'); // Initially, all items
 
-    // Define showPage as a global function
     function showPage(page) {
-        var cardContainer = $('#card-container'); // The container holding the project cards
-        var pagination = $('#pagination'); // Pagination container
+        var cardContainer = $('#card-container');
+        var pagination = $('#pagination');
 
-        // Hide all items initially
         $('.record-item').hide();
-
-        // If there are filtered items, use them; otherwise, use all items
         var items = filteredItems;
         var totalItems = items.length;
 
-        // Remove any existing 'No projects found' message
         cardContainer.find('.not-found').remove();
 
-        // If no items are found, display a "No projects found" message
         if (totalItems === 0) {
-            // cardContainer.append('<p class="not-found">No projects found</p>'); // Add new message
-            pagination.empty(); // Clear pagination if no items
-            return; // Stop execution if no items
+            pagination.empty();
+            return;
         }
 
-        // Calculate start and end indices for pagination
+        // Use itemsPerPage directly (which is set from data-limit)
         var start = (page - 1) * itemsPerPage;
         var end = start + itemsPerPage;
 
-        // Show items for the current page
         items.slice(start, end).show();
 
-        // Build pagination
         pagination.empty();
         var totalPages = Math.ceil(totalItems / itemsPerPage);
 
-        // Create Previous button
         if (page > 1) {
             pagination.append('<li class="page-item"><a class="page-link" href="#" data-page="' + (page - 1) + '"> < </a></li>');
         }
 
-        // Display pagination with ellipses
         if (totalPages <= 5) {
-            // If there are 5 or fewer pages, show all
             for (var i = 1; i <= totalPages; i++) {
                 appendPageItem(pagination, i, page);
             }
         } else {
-            // Show first page
             appendPageItem(pagination, 1, page);
-            
-            // Show ellipsis if necessary
             if (page > 3) {
                 pagination.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
             }
 
-            // Show a range of pages around the current page
-            var startPage = Math.max(2, page - 1); // Start from 2 or one before current
-            var endPage = Math.min(totalPages - 1, page + 2); // End at totalPages - 1 or one after current
+            var startPage = Math.max(2, page - 1);
+            var endPage = Math.min(totalPages - 1, page + 2);
             
             for (var i = startPage; i <= endPage; i++) {
                 appendPageItem(pagination, i, page);
             }
 
-            // Show ellipsis if necessary
             if (page < totalPages - 2) {
                 pagination.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
             }
 
-            // Show last page
             appendPageItem(pagination, totalPages, page);
         }
 
-        // Create Next button
         if (page < totalPages) {
             pagination.append('<li class="page-item"><a class="page-link" href="#" data-page="' + (page + 1) + '"> > </a></li>');
         }
     }
 
-    // Helper function to append page item
     function appendPageItem(pagination, pageNum, currentPage) {
         var pageItem = $('<li class="page-item"><a class="page-link" href="#" data-page="' + pageNum + '">' + pageNum + '</a></li>');
         if (pageNum === currentPage) {
@@ -215,37 +192,27 @@ else{
     }
 
     $(document).ready(function() {
-        // Initial page load
         showPage(1);
 
-        // Pagination click event
         $('#pagination').on('click', 'a', function(e) {
             e.preventDefault();
-            var page = parseInt($(this).data('page')); // Get the page number from data attribute
+            var page = parseInt($(this).data('page'));
             showPage(page);
         });
 
-        // Search filter
         $('#filter').on('keyup', function() {
             var searchValue = $(this).val().toLowerCase();
-
-            // Filter items based on search input and update filteredItems
             filteredItems = $('.record-item').filter(function() {
                 return $(this).find('.title').text().toLowerCase().indexOf(searchValue) > -1;
             });
-
-            // Recalculate pagination for filtered results and show first page
             showPage(1);
         });
 
-        // Clear search input handling
         $('#filter').on('input', function() {
             var searchValue = $(this).val().toLowerCase();
-
-            // If search field is cleared, reset to show all items
             if (!searchValue) {
-                filteredItems = $('.record-item'); // Reset to all items
-                showPage(1); // Show the first page of all items
+                filteredItems = $('.record-item');
+                showPage(1);
             }
         });
     });
