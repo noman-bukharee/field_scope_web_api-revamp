@@ -67,7 +67,7 @@ use App\Models\User;
             </div>
         </div>
         <div class="col-12 mt-2">
-            <div class="row" id="card-container">
+            <div class="row" id="card-container" data-limit="12">
                 <pre>
                             
                             </pre>

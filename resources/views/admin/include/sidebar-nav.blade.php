@@ -3,9 +3,20 @@
     
         <header class="sidebar-heading">
             <div class="side-logo">
+            @if($roleName == 'admin')
                 <a href="{{ URL::to('admin/user_type') }}">
                     <img src="{{asset("assets/img/logo.png")}}" alt="" />
                 </a>
+            @elseif($roleName == 'manager')
+                <a href="{{ URL::to('admin/project') }}">
+                    <img src="{{asset("assets/img/logo.png")}}" alt="" />
+                </a>
+            @elseif($roleName == 'standard')
+                <a href="{{ URL::to('admin/photo_feed') }}">
+                    <img src="{{asset("assets/img/logo.png")}}" alt="" />
+                </a>
+            @endif
+                
             </div>
         </header>
         <nav>

@@ -1196,6 +1196,8 @@ class ReportController extends Controller
         $this->mpdf->SetDefaultBodyCSS('background-image-resize', "3");
 
         $this->companyIntroduction();
+        //Merge Additional Document
+        $this->additionalDocuments();
         $this->fourImagesTemplate($project->project_media);
         $this->surveyTemplate($project->project_survey);
         $this->estimatesTemplate($project->project_media);
@@ -1236,6 +1238,24 @@ class ReportController extends Controller
         return response($this->mpdf->Output("test", "I"), 200)->header('Content-Type', 'application/pdf');
     }
 
+    //Noman Ali Merge Additional Documents
+    public function additionalDocuments()
+    {
+        $companyId = $this->projectDetails['company_id']; // Retrieve the company ID from the project details
+        $documents = $this->getDocuments($companyId);
+
+        foreach ($documents as $document) {
+            $this->mpdf->SetSourceFile($document['path']);
+            $tplIdx = $this->mpdf->ImportPage(1);
+            $this->mpdf->UseTemplate($tplIdx);
+        }
+    }
+
+    public function getDocuments($companyId)
+    {
+        return ReportTemplate::where('company_id', $companyId)->where('identifier', 'documents')->get();
+    }
+
     public function coverPage(){
         $this->mpdf->AddPage(
             '', // L - landscape, P - portrait
@@ -1262,6 +1282,9 @@ class ReportController extends Controller
     }
 
     public function companyIntroduction(){
+        //merge additional report pdf documenct after company introduction
+        //get $data['documents'] from function listView and merge pdf document after company introducition
+
 
         if(!empty($this->companyTemplates) AND !empty($this->companyDetails)){
 
@@ -1289,28 +1312,6 @@ class ReportController extends Controller
         }
     }
 
-    /** Isn't getting used anywhere so commenting so to be retired closed in date  25 feb 22
-     *
-     public function ownerAuthorization(){
-        $this->mpdf->SetHTMLHeader(view('reports/v2/header', ['project' => $this->projectDetails,'companyDetails' => $this->companyDetails ])->render());
-        $this->mpdf->AddPage(
-            '', // L - landscape, P - portrait
-            '', // E-even|O-odd|even|odd|next-odd|next-even
-            '', '', '',
-            15, // margin_left
-            15, // margin right
-            40, // margin top
-            60, // margin bottom
-            0, // margin header
-            0);
-        $this->mpdf->SetHTMLFooter(view('reports/v2/footer', ['project' => $this->projectDetails,'companyDetails' => $this->companyDetails])->render());
-        $companyReport=$request['request_options']['owner_authorization'];
-        $this->mpdf->WriteHTML(
-            view("reports/v2/owner_authorization",
-                ['companyDetails' => $companyReport ]
-            )->render()
-        );
-    }*/
 
     public function termsNConditions()
     {

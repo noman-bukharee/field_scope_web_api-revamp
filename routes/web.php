@@ -10,7 +10,7 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/', 'HomeController@index');
+Route::get('/', 'HomeController@index')->middleware('guest');
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     // Route::group(['middleware' => ['auth', 'check.role']], function () {
     Route::get('user_type', function () {
@@ -61,7 +61,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     });
 
     Route::get('/', function () {
-        return view('web.index');
+        return view('admin.index');
     });
     // Route::get('forbidden', function () {
     //     return view('admin.forbidden');

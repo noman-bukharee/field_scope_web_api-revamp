@@ -30,6 +30,7 @@
             </form>
         </div>
     </div>
+    @include('admin.auth.footer')
 @endsection
 @push("page_css")
     <style>

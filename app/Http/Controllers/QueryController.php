@@ -382,53 +382,52 @@ class QueryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function updateQuery(Request $request, $id = NULL)
+    public function updateQuery(Request $request, $id = null)
     {
-
-        \Log::debug("Request: ".print_r($request->all(),1));
-        $this->__view = 'admin/questionnaire?page='.$request['page'];
+        \Log::debug("Request: " . print_r($request->all(), 1));
+        $this->__view = 'admin/questionnaire?page=' . $request['page'];
         $this->__is_ajax = true;
         $this->__collection = false;
         $request['query_id'] = $id;
-        //<editor-fold desc="Validation">
-        $param_rules['company_id']      = 'required';
-        $param_rules['query_id']        = 'nullable|int';
-        $param_rules['area']            = 'required|int';
-        $param_rules['question']        = 'required|string';
-        $param_rules['type']            = 'required';
-        $param_rules['is_required']     = 'required|in:true,false';
 
-        $param_rules['options.*']       = 'required_if:type,checkbox,radio|distinct';
-        $param_rules['help_photo']      = 'nullable|mimes:jpg,jpeg,png,gif,pdf';
-        $param_rules['photo_view']      = 'required_if:type,checkbox,radio';
+        // Validation
+        $param_rules = [
+            'company_id' => 'required',
+            'query_id' => 'nullable|int',
+            'area' => 'required|int',
+            'question' => 'required|string',
+            'type' => 'required',
+            'is_required' => 'required|in:true,false',
+            'options.*' => 'required_if:type,checkbox,radio|distinct',
+            'help_photo.*' => 'nullable|mimes:jpg,jpeg,png,gif,pdf|max:2048', // Added max file size (2MB)
+            'photo_view' => 'required_if:type,checkbox,radio',
+        ];
 
-        $customMessages['options.*.distinct'] = "The options have a duplicate value";
-        $customMessages['photo_view.required_if'] = "Photo View field is required";
+        $customMessages = [
+            'options.*.distinct' => "The options have a duplicate value",
+            'photo_view.required_if' => "Photo View field is required",
+            'help_photo.*.mimes' => "Help photos must be of type jpg, jpeg, png, gif, or pdf",
+            'help_photo.*.max' => "Help photos must not exceed 2MB",
+        ];
 
-
-        $response = $this->__validateRequestParams($request->all(), $param_rules,$customMessages);
-        if($this->__is_error == true){
+        $response = $this->__validateRequestParams($request->all(), $param_rules, $customMessages);
+        if ($this->__is_error) {
             $error = \Session::get('error');
-            $this->__setFlash('danger','Not updated Successfully' , $error['data']);
+            $this->__setFlash('danger', 'Not updated Successfully', $error['data']);
             return $response;
         }
-        //</editor-fold>
-
 
         $updateResult = Query::updateQuery($request);
-//        dd('$updateResult',$updateResult);
 
-
-        if(!empty($updateResult['error'])){
+        if (!empty($updateResult['error'])) {
             $this->__is_paginate = false;
             $this->__is_collection = false;
             return $this->__sendError($updateResult['error'], [], 400);
         }
 
-
         $this->__is_paginate = false;
         $this->__collection = false;
-        return $this->__sendResponse('Query', [], 200,'Your query has been saved successfully.');
+        return $this->__sendResponse('Query', [], 200, 'Your query has been saved successfully.');
     }
 
 

@@ -121,7 +121,12 @@ else{
 @stack("page_js")
 
 <script>
-    var itemsPerPage = 12;
+    // var limit = $('#card-container').attr('data-limit').val();
+    var limit = $("#card-container").each( function () {
+        $(this).val( $(this).attr("data-limit") );
+        console.log($(this).val());
+    });
+    var itemsPerPage = limit[0].value;
     var filteredItems = $('.record-item'); // Initially, all items
 
     // Define showPage as a global function

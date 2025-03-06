@@ -260,7 +260,7 @@
         </div>
         <div class="row"></div>
     <!-- Help Photo Modal -->
-        <div
+    <div
           class="modal fade"
           id="companyLogoModal"
           tabindex="-1"
@@ -281,7 +281,7 @@
                 ></button>
               </div>
               <div class="modal-body">
-                <div class="upload-drop-zone  @if(!empty($data['query']['image_url'])) hide @endif"  id="drop-zone">
+                <div class="upload-drop-zone"  id="drop-zone">
                     <div class="company-logo-img">
                         <div class="cvs-import-tile text-center">
                             <p>Drag and drop to upload your CSV file </p>
@@ -292,7 +292,7 @@
                                     <ul class="add-cancel-btn drag-btn">
                                         <li>Drag</li>
                                         <!-- <label for="js-upload-files" class="btn browse-btn">Browse</label> -->
-                                        <input name="logo" type="file" id="js-upload-files" style="visibility:hidden;" class="uploadlogo @if(!empty($data['query']['image_url'])) {{"hide"}} @endif"/>
+                                        <input name="help_photo[]" type="file" id="js-upload-files" multiple style="visibility:hidden;" class="uploadlogo @if(!empty($data['query']['image_url'])) {{"hide"}} @endif"/>
 
                                     </ul>
                                 </span>
@@ -300,17 +300,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="row image_preview @if(empty($data['query']['image_url'])) hide @endif" >
-                    @if(!empty($data['query']['image_url'])) <input type="hidden" name="image_set" value="true" /> @endif
-                    <div class="col-md-12 text-center">
-                        <img  src="{{ !empty($data['query']['image_url']) ? url("uploads/media/".$data['query']['image_url']) : '' }}" class="img-thumbnail" style="max-height: 300px;"/>
-                    </div>
-                    <div class="delete-sec">
-                        <button type="button" class="delete-btn image_remove">
-                            <div><img src="../assets/img/tag-icon.png" alt="" /></div>
-                            <div class="ms-2 ">Remove</div>
-                        </button>
-                    </div>
+                <div class="row image_preview">
+                    @if(!empty($data['query']['image_url']))
+                        @foreach($data['query']['image_url'] as $index => $image)
+                            <div class="col-md-12 text-center image-container">
+                                <img src="{{ url('uploads/media/' . $image) }}" class="img-thumbnail" style="max-height: 300px;"/>
+                                <!-- Hidden input to track existing image -->
+                                <input type="hidden" name="existing_images[]" value="{{ $image }}" class="existing-image">
+                                <button type="button" class="delete-btn photo_remove">Remove</button>
+                            </div>
+                        @endforeach
+                        <input type="hidden" name="image_set" value="true" />
+                    @endif
                 </div>
                 
               </div>
@@ -373,101 +374,222 @@
             font-family: 'EuclidSquare-Medium' !important;!i;!;
             font-size: 16px;
         }
+        div#companyLogoModal .image-container {
+            overflow: visible;
+            margin: 30px 0px;
+        }
   </style> 
   @endpush 
   @push("page_js") 
   <script>
     // Droopzone
+    // +function ($) {
+    //     'use strict';
+
+    //     // UPLOAD CLASS DEFINITION
+    //     // ======================
+
+    //     var dropZone = document.getElementById('drop-zone');
+    //     var uploadForm = document.getElementById('editQuestionForm');
+    //     let help_photo;
+
+    //     var startUpload = function (files) {
+    //         console.log('startUpload', files);
+    //     }
+
+    //     uploadForm.addEventListener('submit', function (e) {
+    //         var uploadFiles = document.getElementById('js-upload-files').files;
+    //         e.preventDefault();
+
+    //         var fd = new FormData($('#editQuestionForm')[0]);
+    //         let image_set = $(".image_preview").find("input[name='image_set']").first().val();
+
+    //         console.log('not equal undefined',typeof (help_photo) !== 'undefined', help_photo);
+    //         console.log('image_set',$(".image_preview").find("input[name='image_set']").first().val());
+
+    //         if (typeof (help_photo) !== 'undefined' ) {
+    //             for (var i = 0; i < help_photo.length; i++) {
+    //                 fd.append('help_photo[]', help_photo[i]);
+    //             }
+    //         }else{
+    //             fd.append('image_set',$(".image_preview").find("input[name='image_set']").first().val());
+    //         }
+
+    //         let id = "{{!empty($data['query_id']) ? "/".$data['query_id'] : null}}";
+
+
+    //         $.ajax({
+    //             type: "POST",
+    //             enctype: 'multipart/form-data',
+    //             url: '{{URL::to('admin/questionnaire/update')}}' + id,
+    //             data: fd,
+    //             processData: false,
+    //             contentType: false,
+    //             cache: false,
+    //             success: (response) => {
+    //                 let alertTitle = response.code !== 200 ? "Error": "Success" ;
+    //                 window.location.href = "{{url('/admin/questionnaire')}}";
+    //                 // $("#alertModal").find(".modal-title").text(alertTitle);
+    //                 // $("#alertModal").find(".updated-title p").text(response.message);
+    //                 // $("#alertModal").modal({show: true});
+    //             }
+    //         });
+
+    //         startUpload(uploadFiles)
+    //     })
+
+    //     dropZone.ondrop = function (e) {
+    //         e.preventDefault();
+    //         this.className = 'upload-drop-zone';
+    //         help_photo = e.dataTransfer.files;
+    //         console.log('Noman', help_photo[0]);
+    //         // startUpload(e.dataTransfer.files)
+
+    //         if (FileReader && help_photo && help_photo.length) {
+    //             for (var i = 0; i < help_photo.length; i++) {
+    //                 var fr = new FileReader();
+    //                 fr.onload = function () {
+    //                     // document.getElementById(outImage).src = fr.result;
+    //                     var imageContainer = $('<div class="image-container"></div>');
+    //                     var image = $('<img src="' + fr.result + '" class="img-thumbnail" style="max-height: 300px;"/>');
+    //                     var removeButton = $('<button type="button" class="delete-btn photo_remove">Remove</button>');
+    //                     imageContainer.append(image).append(removeButton);
+    //                     $('.image_preview').append(imageContainer);
+
+    //                     if ($('.image_preview').hasClass('hide')) {
+    //                         $('.image_preview').removeClass('hide');
+    //                     }
+
+    //                 }
+    //                 console.log("createObjectURL: ", URL.createObjectURL(help_photo[i]));
+
+    //                 fr.readAsDataURL(help_photo[i]); // Initiating Reader that eventually trigger .onload
+    //             }
+    //             // $('.upload-drop-zone').addClass('hide');
+    //         }
+    //     }
+
+    //     dropZone.ondragover = function () {
+    //         this.className = 'upload-drop-zone drop';
+    //         return false;
+    //     }
+
+    //     dropZone.ondragleave = function () {
+    //         this.className = 'upload-drop-zone';
+    //         return false;
+    //     }
+    //     // Add multiple attribute to input file
+    //     document.getElementById('js-upload-files').setAttribute('multiple', 'multiple');
+
+    // }(jQuery);
     +function ($) {
         'use strict';
 
-        // UPLOAD CLASS DEFINITION
-        // ======================
-
         var dropZone = document.getElementById('drop-zone');
         var uploadForm = document.getElementById('editQuestionForm');
-        let help_photo;
-
-        var startUpload = function (files) {
-            console.log('startUpload', files);
-        }
+        let help_photos = [];
 
         uploadForm.addEventListener('submit', function (e) {
-            var uploadFiles = document.getElementById('js-upload-files').files;
             e.preventDefault();
-
             var fd = new FormData($('#editQuestionForm')[0]);
-            let image_set = $(".image_preview").find("input[name='image_set']").first().val();
-
-            console.log('not equal undefined',typeof (help_photo) !== 'undefined', help_photo);
-            console.log('image_set',$(".image_preview").find("input[name='image_set']").first().val());
-
-            if (typeof (help_photo) !== 'undefined' ) {
-                fd.append('help_photo', help_photo[0]);
-            }else{
-                fd.append('image_set',$(".image_preview").find("input[name='image_set']").first().val());
+            console.log('Files to send:', help_photos.length);
+            if (help_photos.length > 0) {
+                help_photos.forEach((photo, index) => {
+                    fd.append('help_photo[]', photo);
+                });
             }
+            // No need to manually append existing_images or image_set; FormData includes them automatically
 
-            let id = "{{!empty($data['query_id']) ? "/".$data['query_id'] : null}}";
-
+            let id = "{{ !empty($data['query_id']) ? '/' . $data['query_id'] : '' }}";
 
             $.ajax({
                 type: "POST",
                 enctype: 'multipart/form-data',
-                url: '{{URL::to('admin/questionnaire/update')}}' + id,
+                url: '{{ URL::to('admin/questionnaire/update') }}' + id,
                 data: fd,
                 processData: false,
                 contentType: false,
                 cache: false,
                 success: (response) => {
-                    let alertTitle = response.code !== 200 ? "Error": "Success" ;
-                    window.location.href = "{{url('/admin/questionnaire')}}";
-                    // $("#alertModal").find(".modal-title").text(alertTitle);
-                    // $("#alertModal").find(".updated-title p").text(response.message);
-                    // $("#alertModal").modal({show: true});
+                    window.location.href = "{{ url('/admin/questionnaire') }}";
+                },
+                error: (error) => {
+                    console.error('Upload failed:', error);
                 }
             });
-
-            startUpload(uploadFiles)
-        })
+        });
 
         dropZone.ondrop = function (e) {
             e.preventDefault();
             this.className = 'upload-drop-zone';
-            help_photo = e.dataTransfer.files;
-            // startUpload(e.dataTransfer.files)
-
-            if (FileReader && help_photo && help_photo.length) {
-                var fr = new FileReader();
-                fr.onload = function () {
-                    // document.getElementById(outImage).src = fr.result;
-                    $('.image_preview').find('img.img-thumbnail').attr('src', fr.result);
-
-                    if ($('.image_preview').hasClass('hide')) {
-                        $('.image_preview').removeClass('hide');
-                    }
-
+            help_photos = Array.from(e.dataTransfer.files);
+            console.log('Dropped files:', help_photos.length);
+            
+            if (FileReader && help_photos.length) {
+                if (!{{ !empty($data['query_id']) ? 'true' : 'false' }}) {
+                    $('.image_preview').empty();
                 }
-                console.log("createObjectURL: ", URL.createObjectURL(help_photo[0]));
-
-                fr.readAsDataURL(help_photo[0]); // Initiating Reader that eventually trigger .onload
-                $('.upload-drop-zone').addClass('hide');
+                help_photos.forEach(file => {
+                    var fr = new FileReader();
+                    fr.onload = function () {
+                        var imageContainer = $('<div class="image-container"></div>');
+                        var image = $('<img src="' + fr.result + '" class="img-thumbnail" style="max-height: 300px;"/>');
+                        var removeButton = $('<button type="button" class="delete-btn photo_remove">Remove</button>');
+                        imageContainer.append(image).append(removeButton);
+                        $('.image_preview').append(imageContainer);
+                        
+                        if ($('.image_preview').hasClass('hide')) {
+                            $('.image_preview').removeClass('hide');
+                        }
+                    };
+                    fr.readAsDataURL(file);
+                });
+                // $('.upload-drop-zone').addClass('hide');
             }
-        }
+        };
 
         dropZone.ondragover = function () {
             this.className = 'upload-drop-zone drop';
             return false;
-        }
+        };
 
         dropZone.ondragleave = function () {
             this.className = 'upload-drop-zone';
             return false;
-        }
+        };
 
+        $(document).on('click', '.photo_remove', function () {
+            var $container = $(this).parent();
+            var index = $('.image-container').index($container);
+            
+            // If it’s an existing image, removing it deletes the hidden input (handled by DOM)
+            // If it’s a new upload, remove it from help_photos
+            if ($container.find('.existing-image').length === 0 && index >= ($('.image-container').length - help_photos.length)) {
+                help_photos.splice(index - ($('.image-container').length - help_photos.length), 1);
+            }
+            $container.remove();
+            
+            if ($('.image_preview').find('.image-container').length === 0) {
+                $('.image_preview').addClass('hide');
+                $('.upload-drop-zone').removeClass('hide');
+            }
+        });
     }(jQuery);
     //Hit Event Triggers Implementation
     $(document).ready(function () {
+        $(document).on('click', '.photo_remove', function () {
+            var imageContainer = $(this).parent();
+            let $imagePreview = $(this).closest('.image_preview');
+            
+            let $modalBody = $(this).closest('.modal-body');
+            imageContainer.remove();
+            if ($('.image_preview').find('.image-container').length === 0) {
+                $('.image_preview').addClass('hide');
+                $modalBody.find(".upload-drop-zone , .cover-drop-zone").first().removeClass("hide");
+                $imagePreview.find("input[name='image_set']").first().attr("disabled", true);
+            }
+            
+        });
         /** image_remove is getting used in two inputs:
              *  1. Cover Image
              *  2. Company Logo  */
@@ -648,65 +770,33 @@
   <script>
     $(document).ready(function() {
         const optionTypes = ["radio", "checkbox"];
-        
+    
+        // Function to toggle option fields and "Add Option" button visibility
+        function updateOptionVisibility(type) {
+            if (optionTypes.includes(type)) {
+                let title = type === 'radio' ? "Single Select" : "Multi Select";
+                $(".options").show();
+                $(".add_option").show();
+                $(".options .title").text(title);
+            } else {
+                $(".options").hide();
+                $(".add_option").hide();
+            }
+        }
+
+        // Initialize based on the current question type
+        let initialType = $("input[name='type']:checked").val() || 'text';
+        updateOptionVisibility(initialType);
+
         // Event listener for type selection buttons
         $('.option_types .btn-theme').on('click', function () {
             let type = $(this).find("input[name='type']").val();
+            updateOptionVisibility(type);
 
-            // Handle radio and checkbox types
-            if (optionTypes.includes(type)) {
-                let title = type === 'radio' ? "Single Select" : "Multi Select";
-
-                // Generate input fields for options
-                let optionsHtml = `
-                    <label for="basic-url" class="title color-blue font-22 mb-3">${title}</label>
-                    <div class="input-group mt-3 mb-3">
-                        <input type="text" name="options[]" data-index="0" value="N/A" class="form-control" placeholder="Option 1">
-                        <span class="input-group-btn remove_option">
-                            <button class="btn btn-default inputs close-icon" type="button">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </span>
-                    </div>
-                    <div class="input-group mt-3">
-                        <input type="text" name="options[]" data-index="1" class="form-control" placeholder="Option 2">
-                        <span class="input-group-btn remove_option">
-                            <button class="btn btn-default inputs close-icon" type="button">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </span>
-                    </div>`;
-
-                $(".options").html(optionsHtml).show();
-                $(".add_option").show();
-
-            // Handle text type
-            } 
-            // else if (type === 'text') {
-            //     let textHtml = `
-            //         <label for="text-input" class="title color-blue font-22 mb-3">Input Field</label>
-            //         <div class="input-group mb-3">
-            //             <input type="text" name="text_input" class="form-control" placeholder="Enter text here">
-            //         </div>`;
-
-            //     $(".options").html(textHtml).show();
-            //     $(".add_option").hide();
-
-            // // Handle date type
-            // } else if (type === 'date') {
-            //     let dateHtml = `
-            //         <label for="date-input" class="title color-blue font-22 mb-3">Date Field</label>
-            //         <div class="input-group mb-3">
-            //             <input type="date" name="date_input" class="form-control">
-            //         </div>`;
-
-            //     $(".options").html(dateHtml).show();
-            //     $(".add_option").hide();
-            // } 
-            else {
-                console.log('no options');
-                $(".options").hide();
-                $(".add_option").hide();
+            // Handle active class for visual feedback
+            $('.option_types .btn-theme').removeClass('active-class');
+            if ($(this).find('input[type="radio"]').is(':checked')) {
+                $(this).addClass('active-class');
             }
         });
 
@@ -725,6 +815,7 @@
                 </div>`;
             $(".options").append(optionHtml);
         });
+
 
         // Event listener for removing an option
         $(document).on('click', '.remove_option', function(){

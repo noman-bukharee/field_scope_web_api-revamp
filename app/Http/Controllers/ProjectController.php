@@ -735,9 +735,36 @@ class ProjectController extends Controller
         $user = User::where('id', session('user')->id)->first();
         $userGroupId = $user->user_group_id;
 
+        // // Set the assigned user ID based on the role of the user
+        // if ($userGroupId == 1) { // Admin
+        //     $params['assigned_user_id'] = 'project.user_id';
+        // } elseif ($userGroupId == 2) { // Agent
+        //     $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+        //         ->where('user.id', session('user')->id)
+        //         ->where('cg.id', $user->company_group_id)
+        //         ->first();
+
+        //     $userType = $userInsector->role_id;
+        //     if ($userType == 2) { // Manager
+        //         $params['assigned_user_id'] = 'project.user_id';
+        //     } else if ($userType == 3) { // Standard
+        //         $params['assigned_user_id'] = 'project.assigned_user_id';
+        //     }
+        // }
+
+        // Initialize the $list['inspectors'] variable
+        $list['inspectors'] = [];
+       
         // Set the assigned user ID based on the role of the user
         if ($userGroupId == 1) { // Admin
             $params['assigned_user_id'] = 'project.user_id';
+
+            $userWhere = [
+                'company_id' => $request['company_id'],
+                'user_group_id' => 2,
+            ];
+            $list['inspectors'] = User::where($userWhere)->selectRaw("id, CONCAT(first_name,' ',last_name) AS userNames")->get();
+            
         } elseif ($userGroupId == 2) { // Agent
             $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
                 ->where('user.id', session('user')->id)
@@ -746,9 +773,22 @@ class ProjectController extends Controller
 
             $userType = $userInsector->role_id;
             if ($userType == 2) { // Manager
-                $params['assigned_user_id'] = 'project.user_id';
-            } else if ($userType == 3) { // Standard
+                // Only allow managers to assign projects to standard users
                 $params['assigned_user_id'] = 'project.assigned_user_id';
+                $list['inspectors'] = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+                    ->where('cg.company_id', $user->company_id)
+                    ->where('cg.role_id', 3)
+                    ->selectRaw("user.id, CONCAT(user.first_name,' ',user.last_name) AS userNames, cg.role_id")
+                    ->get();   
+            } else if ($userType == 3) { // Standard
+                // Prevent standard users from assigning projects to themselves
+                $params['assigned_user_id'] = 'project.assigned_user_id';
+                $list['inspectors'] = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+                    ->where('cg.id', $user->company_group_id)
+                    ->where('user.id', '!=', session('user')->id)
+                    ->where('cg.role_id', 3)
+                    ->selectRaw("user.id, CONCAT(user.first_name,' ',user.last_name) AS userNames, cg.role_id")
+                    ->get();
             }
         }
 
@@ -757,13 +797,13 @@ class ProjectController extends Controller
         $param = $request->all();
         $param['paginate'] = FALSE;
         $listAllProjects = Project::getList($param);
-
+        
         // Get a list of inspectors to pass to the view
-        $userWhere = [
-            'company_id' => $request['company_id'],
-            'user_group_id' => 2,
-        ];
-        $list['inspectors'] = User::where($userWhere)->selectRaw("id, CONCAT(first_name,' ',last_name) AS userNames")->get();
+        // $userWhere = [
+        //     'company_id' => $request['company_id'],
+        //     'user_group_id' => 2,
+        // ];
+        // $list['inspectors'] = User::where($userWhere)->selectRaw("id, CONCAT(first_name,' ',last_name) AS userNames")->get();
         // foreach($dataTableRecord['records'] as $record){
         //     media = ProjectMedia::getById($record['id'],['tags_data','category']);
         //     $list["media"][] = [
@@ -890,7 +930,7 @@ class ProjectController extends Controller
         $project->name              = $request->name;
         $project->address1          = $request->address1;
         $project->address2          = $request->address2;
-        $project->assigned_user_id  = $request->assigned_user_id;
+        $project->assigned_user_id  = $request->assigned_user_id ? $request->assigned_user_id : $request->user_id;
         $project->user_id           = $request->user_id;
         $project->customer_email    = $request->customer_email;
         $project->claim_num         = $request->claim_num;

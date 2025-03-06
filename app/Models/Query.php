@@ -13,7 +13,10 @@ class Query extends Model
 {
     protected $table = "query";
     protected $fillable = ['company_id', 'query', 'type', 'category_id', 'options', 'photo_view_id','is_required', 'custom_tag', 'created_at' ,'order_by', 'image_url'];
-
+    //Add Multiple Help Photos
+    protected $casts = [
+        'image_url' => 'array', // Automatically casts JSON to array
+    ];
     use SoftDeletes;
 
     public static function getList($param)
@@ -112,74 +115,132 @@ class Query extends Model
         return $query->get();
     }
 
-    public static function updateQuery($request){
-        $question = $request['question'];
+//     public static function updateQuery($request){
+//         $question = $request['question'];
+//         $queryId = $request['query_id'];
+//         $type = $request['type'];
+//         //$orderBy = $request['order_by'];
+//         $options =   $request['options'];
+//         $photo_view =   $request['photo_view'];
+//         $area =   $request['area'];
+//         $image_set =   $request['image_set'];
+
+
+//                 $queryUpdateData = [];
+
+//                 if ($request->file('help_photo')) {
+//                     $queryUpdateData['image_url'] =
+//                         Helper::uploadFile($request->file('help_photo'), 'sample_query', Config::get('constants.MEDIA_IMAGE_PATH'));
+//                 }else if ($image_set == 'false') {
+//                     \Log::debug('image else '.$image_set);
+//                     $queryUpdateData['image_url'] = "";
+//                 }
+
+//                 $queryUpdateData['company_id'] = $request['company_id'];
+//                 $queryUpdateData['is_required'] = filter_var($request['is_required'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+//                 $queryUpdateData['query'] = $question;
+//                 $queryUpdateData['type'] = $type;
+//                 $queryUpdateData['updated_at'] = date('Y-m-d H:i:s');
+//                 $queryUpdateData['category_id'] = !empty($area) ? $area : NULL;
+//                 $queryUpdateData['photo_view_id'] = !empty($photo_view) ? $photo_view : NULL;
+
+
+//                 if (!empty($options) && ($type == 'text' || $type == 'date' || $type == 'sign')) {
+//                     $queryUpdateData['options'] = '';
+//                 } else {
+
+// //                    if (!empty($naRule[$key])) {
+// //                        /** IF NA is selected */
+// //
+// //
+// //                    } else {
+// //
+// //                        /** IF NA is not selected
+// //                         *      -> Need to remove NA if exists in options
+// //                         */
+// //                        $queryUpdateData['photo_view_id'] = NULL;
+// //
+// //                        if (in_array('N/A', $option[$key])) {
+// //                            /** N.A is IN request options
+// //                             *      -> Must remove it (cuz NA wasn't selected) *
+// //                             */
+// //                            if (($optionKey = array_search('N/A', $option[$key])) !== false) {
+// //                                unset($option[$key][$optionKey]);
+// //                            }
+// //                        }
+// //                    }
+//                     $queryUpdateData['options'] = trim(implode(',', $options), ' ,');
+
+//                     if(empty($queryUpdateData['options'])){
+//                         return ['error' => 'Required Options Missing at question.'];
+//                     }
+//                 }
+//                 \Log::debug('is_required data: '.print_r([!empty($request['is_required'])] , 1));
+//                 \Log::debug('request data: '.print_r($request->all() , 1));
+//                 \Log::debug('update data: '.print_r($queryUpdateData , 1));
+
+//                 $qResult = self::updateOrCreate(['id' => $queryId],$queryUpdateData);
+
+
+//         return $qResult;
+//     }
+    public static function updateQuery($request)
+    {
         $queryId = $request['query_id'];
         $type = $request['type'];
-        //$orderBy = $request['order_by'];
-        $options =   $request['options'];
-        $photo_view =   $request['photo_view'];
-        $area =   $request['area'];
-        $image_set =   $request['image_set'];
+        $options = $request['options'];
+        $photo_view = $request['photo_view'];
+        $area = $request['area'];
+        $image_set = $request['image_set'];
 
+        // Fetch existing query if updating
+        $query = $queryId ? self::find($queryId) : null;
+        $existingImages = $query && $query->image_url ? $query->image_url : [];
 
-                $queryUpdateData = [];
+        $queryUpdateData = [
+            'company_id' => $request['company_id'],
+            'is_required' => filter_var($request['is_required'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
+            'query' => $request['question'],
+            'type' => $type,
+            'updated_at' => now(),
+            'category_id' => !empty($area) ? $area : null,
+            'photo_view_id' => !empty($photo_view) ? $photo_view : null,
+        ];
 
-                if ($request->file('help_photo')) {
-                    $queryUpdateData['image_url'] =
-                        Helper::uploadFile($request->file('help_photo'), 'sample_query', Config::get('constants.MEDIA_IMAGE_PATH'));
-                }else if ($image_set == 'false') {
-                    \Log::debug('image else '.$image_set);
-                    $queryUpdateData['image_url'] = "";
-                }
+        // Handle image updates
+        if ($image_set === 'false') {
+            $queryUpdateData['image_url'] = []; // Clear all images
+        } else {
+            // Get retained existing images from the form (defaults to empty array if none sent)
+            $retainedImages = $request->input('existing_images', []);
 
-                $queryUpdateData['company_id'] = $request['company_id'];
-                $queryUpdateData['is_required'] = filter_var($request['is_required'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-                $queryUpdateData['query'] = $question;
-                $queryUpdateData['type'] = $type;
-                $queryUpdateData['updated_at'] = date('Y-m-d H:i:s');
-                $queryUpdateData['category_id'] = !empty($area) ? $area : NULL;
-                $queryUpdateData['photo_view_id'] = !empty($photo_view) ? $photo_view : NULL;
-
-
-                if (!empty($options) && ($type == 'text' || $type == 'date' || $type == 'sign')) {
-                    $queryUpdateData['options'] = '';
-                } else {
-
-//                    if (!empty($naRule[$key])) {
-//                        /** IF NA is selected */
-//
-//
-//                    } else {
-//
-//                        /** IF NA is not selected
-//                         *      -> Need to remove NA if exists in options
-//                         */
-//                        $queryUpdateData['photo_view_id'] = NULL;
-//
-//                        if (in_array('N/A', $option[$key])) {
-//                            /** N.A is IN request options
-//                             *      -> Must remove it (cuz NA wasn't selected) *
-//                             */
-//                            if (($optionKey = array_search('N/A', $option[$key])) !== false) {
-//                                unset($option[$key][$optionKey]);
-//                            }
-//                        }
-//                    }
-                    $queryUpdateData['options'] = trim(implode(',', $options), ' ,');
-
-                    if(empty($queryUpdateData['options'])){
-                        return ['error' => 'Required Options Missing at question.'];
+            // Handle new image uploads
+            $newImageUrls = [];
+            if ($request->hasFile('help_photo')) {
+                foreach ($request->file('help_photo') as $file) {
+                    $path = Helper::uploadFile($file, 'sample_query', Config::get('constants.MEDIA_IMAGE_PATH'));
+                    if ($path) {
+                        $newImageUrls[] = $path;
                     }
                 }
-                \Log::debug('is_required data: '.print_r([!empty($request['is_required'])] , 1));
-                \Log::debug('request data: '.print_r($request->all() , 1));
-                \Log::debug('update data: '.print_r($queryUpdateData , 1));
+            }
 
-                $qResult = self::updateOrCreate(['id' => $queryId],$queryUpdateData);
+            // Combine retained existing images with new uploads
+            $queryUpdateData['image_url'] = array_merge($retainedImages, $newImageUrls);
+        }
 
+        if (!empty($options) && in_array($type, ['text', 'date', 'sign'])) {
+            $queryUpdateData['options'] = '';
+        } elseif (!empty($options)) {
+            $queryUpdateData['options'] = trim(implode(',', $options), ' ,');
+            if (empty($queryUpdateData['options'])) {
+                return ['error' => 'Required Options Missing at question.'];
+            }
+        }
 
-        return $qResult;
+        \Log::debug('update data: ' . print_r($queryUpdateData, 1));
+
+        return self::updateOrCreate(['id' => $queryId], $queryUpdateData);
     }
 
     public static function deleteQuery($id){

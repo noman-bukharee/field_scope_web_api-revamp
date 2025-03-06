@@ -13,13 +13,6 @@
         </div>
         <div class="d-flex flex-wrap align-items-center">
           <!-- Buttons for different modals -->
-
-          <!-- <button
-            class="btn-theme questionnaire-btn"
-            type="button"
-            data-bs-toggle="modal"
-            data-bs-target="#companyLogoModal"
-          > -->
             <a class="btn-theme questionnaire-btn" href="{{ URL::to('admin/questionnaire/add') }}">
               + Add New Question
             </a>
@@ -31,13 +24,15 @@
   <div class="row">
     <div class="col-12">
       <div class="rofing-box">
-        <div class="accordion question-accord" id="accordionExample">
+        <div class="accordion question-accord" id="card-container" data-limit="5" >
             @php
                 // Group the questions by category_name
                 $groupedQuestions = collect($data['data'])->groupBy('category_name');
+                
             @endphp
+            
             @foreach($groupedQuestions as $category => $questions)
-                <div class="accordion-items">
+                <div class="accordion-items record-item">
                     <h2 class="accordion-header" id="heading-{{ Str::slug($category) }}">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapse-{{ Str::slug($category) }}" aria-expanded="true"
@@ -49,12 +44,13 @@
                         aria-labelledby="heading-{{ Str::slug($category) }}" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
                             <ul class="main-ul">
+                                @php $count = 1; @endphp
                                 @foreach($questions as $question)
                                     <li>
                                         <div class="d-flex align-items-center justify-content-between">
                                             <div>
                                                 <p class="rof-heading">
-                                                    {{ $question['query'] }}
+                                                    Question No: {{ $count}} 
                                                 </p>
                                             </div>
                                             <div>
@@ -77,13 +73,22 @@
                                             </p>
                                         </div>
                                     </li>
+                                @php $count++; @endphp
                                 @endforeach
                             </ul>
                         </div>
                     </div>
                 </div>
+                
             @endforeach
+            <nav class="pagination-records" aria-label="Page navigation ">
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- jQuery will populate pagination items here -->
+                </ul>
+            </nav>
         </div>
+
+        
       </div>
     </div>
   </div>

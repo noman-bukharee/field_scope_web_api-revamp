@@ -39,7 +39,7 @@ class CompanyGroup extends Model
 
         if(!empty($param['keyword']) ){
             $keyword = $param['keyword'];
-            $query->whereRaw("( id LIKE '%$keyword%' OR title LIKE '%$keyword%' )");
+            $query->whereRaw("( id LIKE '%$keyword%' OR title LIKE '%$keyword%' OR role_id LIKE '%$keyword%' )");
         }
         $query->orderBy('id','DESC');
         return $query->paginate(Config::get('constants.PAGINATION_PAGE_SIZE'));

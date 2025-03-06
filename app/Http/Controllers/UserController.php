@@ -279,7 +279,7 @@ class UserController extends Controller
                 $stripeResponse = $this->_stripe->createCustomerNewCard($CompanyPUser['stripe_customer_id'], $request['stripeToken']);
 
                 if ($stripeResponse['code'] != 200) {
-                    die('end 4'.$stripeResponse['message']);
+                    // die('end 4'.$stripeResponse['message']);
                     $this->__setFlash('danger', $stripeResponse['message']);
                     return $this->__sendError('Stripe Error', ['message' => $stripeResponse['message']]);
                 } else {
@@ -296,7 +296,7 @@ class UserController extends Controller
                     $charge = $this->_stripe->createCharge($charge_data);
 
                     if ($charge['code'] != 200) {
-                        die('end 5'.$charge['message']);
+                        // die('end 5'.$charge['message']);
                         $this->__setFlash('danger', $charge['message']);
                         return $this->__sendError('Stripe Error', ['message' => $charge['message']]);
                     }
@@ -643,6 +643,7 @@ class UserController extends Controller
 //        $param_rules['email']       = 'required|email';
         $param_rules['mobile_no'] = 'required|string';
         $param_rules['company_group_id'] = 'required|int';
+        $param_rules['password'] = 'nullable|string';
 
         $response = $this->__validateRequestParams($request->all(), $param_rules);
         if ($this->__is_error == true) {
@@ -658,6 +659,9 @@ class UserController extends Controller
         $update['email'] = $request['email'];
         $update['mobile_no'] = $request['mobile_no'];
         $update['company_group_id'] = $request['company_group_id'];
+        if($request['password'] != null){
+            $update['password'] = $this->__encryptedPassword($request['password']);
+        }
         User::where('id', $id)->update($update);
 
         $this->__setFlash('success', 'Updated Successfully');
@@ -679,9 +683,13 @@ class UserController extends Controller
             $this->__setFlash('danger', 'Not Deleted Successfully', $error['data']);
             return $response;
         }
-        $d = User::where('id', $id)->delete();
+        // $d = User::where('id', $id)->delete();
+        $user = User::withTrashed()->where('id', $id)->first();
+        if ($user) {
+            $user->forceDelete();
+        }
 
-        if (!$d) {
+        if (!$user) {
             $error['data'][0] = "Delete Failed ";
             $this->__setFlash('danger', 'Delete Not Successfully', $error['data']);
             return $this->__sendError('Query Error', 'Unable to Delete record.');
@@ -771,7 +779,7 @@ class UserController extends Controller
 
         // Define validation rules
         $param_rules['email'] = 'required|string|email|max:150';
-        $param_rules['password'] = 'required|string|min:6';
+        $param_rules['password'] = 'required|string';
 
         $this->__is_redirect = true;
         $this->__view = 'admin/login';
@@ -785,6 +793,10 @@ class UserController extends Controller
 
         // Perform login by verifying email and encrypted password
         $user = User::login($request->email, $this->__encryptedPassword($request->password));
+        $userInsector = User::leftJoin('company_group AS cg', 'cg.id', '=', 'user.company_group_id')
+        ->where('user.id', $user[0]->id)
+        ->where('cg.id', $user[0]->company_group_id)
+        ->first();
 
         if ($user->isEmpty()) {
             return $this->__sendError(Lang::get('auth.failed'), [], 400);
@@ -842,7 +854,7 @@ class UserController extends Controller
         }
 
         // Return success response
-        return $this->__sendResponse('Auth', $user[0], 200, 'User has been logged in successfully.');
+        return $this->__sendResponse('Auth', $user[0],'inspector', $userInsector, 200, 'User has been logged in successfully.');
     }
     // public function login(Request $request)
     // {

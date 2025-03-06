@@ -76,7 +76,7 @@ use App\Models\User;
             </div>
         </div>
         <div class="col-12 mt-2">
-            <div class="row" id="card-container">
+            <div class="row" id="card-container" data-limit="12">
             
                 @foreach($data as $item)
                     @if(is_array($item))
@@ -268,12 +268,17 @@ use App\Models\User;
                     <div class="">
                         <input  type="text" name="customer_email" placeholder="Customer Email" class="form-control place-color"  />
                     </div>
-                    <select name="assigned_user_id" class="form-select add-select" aria-label="Default select example">
-                        <option disabled selected>-Assign User-</option>
-                        @foreach($listData as $key => $item)
-                            <option value="{{$item->id}}">{{$item->userNames}}</option>
-                        @endforeach
-                    </select>
+                    <!-- Add a hidden input field with the default user ID -->
+                    <input type="hidden" name="assigned_user_id" value="{{session('user')->id}}">
+
+                    @if($roleName == 'admin' || $roleName == 'manager')
+                        <select name="assigned_user_id" class="form-select add-select" aria-label="Default select example">
+                            <option disabled selected>-Assign User-</option>
+                            @foreach($listData as $key => $item)
+                                <option value="{{$item->id}}">{{$item->userNames}}</option>
+                            @endforeach
+                        </select>
+                    @endif
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
@@ -558,6 +563,15 @@ use App\Models\User;
             this.value = this.value.replace(/[^0-9^-]/g, '');
         }
         });
+
+        //Project Assign User validation
+        // Get the default user ID from the hidden input field
+        var defaultUserId = $('input[name="assigned_user_id"]').val();
+
+        // Update the form data to include the default user ID if the Assign User dropdown is not selected
+        if ($('select[name="assigned_user_id"]').val() == '') {
+            $('input[name="assigned_user_id"]').val(defaultUserId);
+        }
     });
 </script>
 <script

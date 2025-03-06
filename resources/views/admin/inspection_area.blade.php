@@ -11,7 +11,6 @@
                 <div>
                     <h2>Inspection Area</h2>
                 </div>
-                <!-- <pre>{{print_r($data['categories'])}}</pre>name,company_group_titles -->
                 
                 <div class="d-flex align-items-center">
                     <div>

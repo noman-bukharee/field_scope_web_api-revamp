@@ -1,6 +1,8 @@
 @extends('admin.auth.master')
 @section('content')
 @section('title', 'Signin')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
     <div class="auth-logo">
         <a href="{{ URL::to('') }}">
@@ -28,9 +30,11 @@
             </div>
 
             <div class="col-12 form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                <label class="custom-field two">
+                <label class="custom-field two position-relative">
                     <input type="password" name="password" id="custom-input2" value="{{ Cookie::get('password') }}" required="required" placeholder="&nbsp;" />
                     <span class="placeholder">Enter your password</span>
+                    <i class="bi bi-eye-slash position-absolute end-0 top-0 mt-2 me-2" id="togglePassword" style="cursor: pointer;"></i>
+                    
                     <div class="invalid-feedback">
                         Please enter your password.
                     </div>
@@ -61,7 +65,35 @@
 @endsection
 @push("page_css")
     <style>
+        .custom-field input:focus + .placeholder.mobile_no{
+            opacity: 1;
+        }
+        .custom-field {
+            position: relative;
+        }
 
+        .custom-field input:focus {
+            box-shadow: none; /* Remove shadow effect on focus */
+        }
+
+        .custom-field label {
+            transition: all 0.2s ease; /* Smooth transition for label */
+        }
+
+        .custom-field input:focus + .placeholder,
+        .custom-field input:not(:placeholder-shown) + .placeholder {
+            top: -10px;
+            font-size: 12px;
+            color: #007bff; /* Change to your desired color */
+        }
+
+        .placeholder {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            transition: all 0.2s ease;
+            color: #aaa;
+        }
     </style>
 @endpush
 @push("page_js")
@@ -101,5 +133,18 @@
                 }
             })
         })
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            var passwordInput = document.getElementById('custom-input2');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('bi-eye-slash');
+                this.classList.add('bi-eye');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('bi-eye');
+                this.classList.add('bi-eye-slash');
+            }
+        });
     </script>
 @endpush
