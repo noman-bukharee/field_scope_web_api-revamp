@@ -14,7 +14,7 @@
         /*border: 1px solid red;*/
         vertical-align: middle;
         ">
-            <img style="width:25%; padding: 0;"
+            <img style="width:10%; padding: 0; margin-top:10px"
                  src="{{$companyDetails->logo_path}}"
 {{--                    src="https://dummyimage.com/3:1x700&text=Company Logo"--}}
                  alt="" />

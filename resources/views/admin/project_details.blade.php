@@ -91,6 +91,7 @@
                       Edit Project
                     </button> -->
                     <a href="#" onclick="editRow({{$data['project']['id']}})"  class="new-btn-theme mt-2 edit-project btn-theme">Edit Project</a>
+                    <a href="#" onclick="deleteRow({{$data['project']['id']}})"  class="new-btn-theme mt-2 delete-project btn-theme">Delete Project</a>
 
                   </div>
                 </div>
@@ -469,6 +470,24 @@
         </div>
     </div>
 </div>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered project-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete the project?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" id="confirmDeleteButton" class="btn btn-save">Delete </button>
+      </div>
+    </div>
+  </div>
+</div>  
 @endsection
 
 @push("page_css")
@@ -900,6 +919,19 @@
                 max-width: 100%;
             }
         }
+        .delete-project {
+            background: #000;
+            color: #fff !important;
+            text-align: center;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        .postal-box p {
+            color: rgba(0, 1, 36, 0.7);
+            font-size: 12px !important;
+        }
     </style>
 @endpush
 @push("page_js")
@@ -1166,6 +1198,45 @@
 
     // Call loadGoogleMaps to dynamically load the script
     loadGoogleMaps();
+    
+        var deleteId; // Store the id to be deleted
+
+        // Delete Row Function
+        function deleteRow(id) {
+            deleteId = id;  // Set the id to be used later for deletion
+                $('#deleteConfirmationModal').modal('show');  // Show the confirmation modal
+            }
+            // Handle delete confirmation button click
+            $('#confirmDeleteButton').on('click', function() {
+                $.ajax({
+                    url: '{!! url('admin/project/delete') !!}/'+deleteId,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')  // Add CSRF token to the headers
+                    },
+                    dataType: 'JSON',
+                    success: function(response) {
+                        $('#deleteConfirmationModal').modal('hide'); // Hide the modal after deletion
+                        $('html, body').animate({scrollTop: '0px'}, 300);
+                        $("div.alert-success.success").text(response.message).show();
+                            setTimeout(()=>{
+                                $("div.alert.alert-success.success").hide();
+                            },5000);
+                            window.location.href = "{!! url('admin/project') !!}"; // Reload the page upon successful deletion
+                    },
+                    error: function(response) {
+                        $('#deleteConfirmationModal').modal('hide');
+                        $('html, body').animate({scrollTop: '0px'}, 300);
+                        $("div.alert-danger.error").text(response.responseJSON.message).show();
+                            setTimeout(()=>{
+                                $("div.alert.alert-danger.error").hide();
+                            },5000);
+                        console.log(response.responseJSON.message)
+                    }
+                });
+            });
+        
+    
 </script>
 
 @endpush

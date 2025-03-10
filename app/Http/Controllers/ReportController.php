@@ -947,7 +947,7 @@ class ReportController extends Controller
         foreach ($documents as $document) {
             $path = base_path("public/{$document->path}");
             if (file_exists($path)) {
-                $this->mpdf->AddPage('', '', '', '', '', 15, 15, 30, 30, 0, 0);
+                $this->mpdf->AddPage('', '', '', '', '', 15, 15, 30, 30, -10, 0);
                 $this->mpdf->SetSourceFile($path);
                 $tplIdx = $this->mpdf->ImportPage(1);
                 $this->mpdf->UseTemplate($tplIdx);

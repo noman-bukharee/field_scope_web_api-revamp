@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-10 col-lg-8">
+                <div class="col-12 col-md-12 col-lg-12">
                 <div class="row">
                     <div class="col-12 col-md-6">
                     <div class="form-check">
@@ -122,9 +122,9 @@
                     </div>
                 </div>
                 </div>
-                <div class="col-12 col-md-2 col-lg-4">
+                <div class="col-12 col-md-12 col-lg-12">
                 <div
-                    class="d-flex justify-content-end h-100 align-items-end"
+                    class="d-flex justify-content-center h-100 align-items-center"
                 >
                     <!-- <button class="btn-theme sus-btn">Subscribe Now</button> -->
                     <a href="{{URL::to('admin/re_subscription')}}" class="btn-theme sub-btn {{$data['companySub']['subscription_id'] != $item['id'] ? 'enabled' : 'disabled'}}" >{{$data['companySub']['subscription_id'] != $item['id'] ? 'Subscribe Now' : 'Subscribed'}}</a>
@@ -203,6 +203,37 @@
             pointer-events: auto;
             filter: none;
             opacity: 1;
+        }
+        .subscription-box .form-check {
+            text-align: center;
+            background: #8080800d;
+            padding: 15px 0px;
+            border-radius: 9px;
+            margin: 12px 0px;
+            border: 1px solid #00000017;
+        }
+
+        .subscription-box .form-check input {
+            margin: 4px 8px;
+        }
+
+        .subscription-box .form-check input:checked {
+            background-color: #1282f2;
+            border-color: #1282f2;
+            font-size:18px;
+        }
+        .subscription-box h2:nth-child(1) {
+            color: #1282f2;
+            font-size: 48px;
+        }
+
+        .subscription-box .text-end h2 {
+            color: #000;
+        }
+        a.btn-theme.sub-btn.enabled,a.btn-theme.sub-btn.disabled {
+            width: 100%;
+            padding: 14px 0px;
+            margin-top: 15px;
         }
     </style>
 @endpush
