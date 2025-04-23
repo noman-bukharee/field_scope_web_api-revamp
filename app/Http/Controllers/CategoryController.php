@@ -97,7 +97,7 @@ class CategoryController extends Controller
         $param['column_index'] = $param['order'][0]['column'];
         $param['sort'] = $param['order'][0]['dir'];
 
-        $records["data"] = array();
+        $records["data"] = [];
         //get records for datatable
 
         if(!empty($param['reOrder'])){
@@ -354,7 +354,7 @@ class CategoryController extends Controller
         $param['column_index'] = $param['order'][0]['column'];
         $param['sort'] = $param['order'][0]['dir'];
 
-        $records["data"] = array();
+        $records["data"] = [];
         //get records for datatable
         $param['parent_id'] = 0;
 

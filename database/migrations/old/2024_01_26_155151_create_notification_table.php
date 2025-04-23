@@ -20,7 +20,7 @@ class CreateNotificationTable extends Migration {
 			$table->integer('target_id');
 			$table->integer('reference_id');
 			$table->string('reference_module', 50);
-			$table->enum('type', array('push','email'));
+			$table->enum('type', ['push','email']);
 			$table->string('title', 100);
 			$table->text('description', 65535);
 			$table->boolean('is_notify');

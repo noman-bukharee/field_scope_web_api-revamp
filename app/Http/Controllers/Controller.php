@@ -417,7 +417,7 @@ class Controller extends BaseController
     }
 
     // have to implement.
-    protected function __sendMailNotInUse($to, $message, $data = array(), $files = array(), $ex_headers = array()) {
+    protected function __sendMailNotInUse($to, $message, $data = [], $files = [], $ex_headers = []) {
         // init vars
         $charset = "utf-8";
         $headers = $ex_headers;

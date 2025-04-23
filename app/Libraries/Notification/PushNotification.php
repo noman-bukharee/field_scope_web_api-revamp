@@ -70,7 +70,7 @@ class PushNotification
     {
         $url =  $fcmUrl = env('FCM_URL');
         $json = json_encode($notification_data);
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $headers[] = 'Authorization: key='. env('FCM_LEGACY_SERVER_KEY');
         $ch = curl_init();

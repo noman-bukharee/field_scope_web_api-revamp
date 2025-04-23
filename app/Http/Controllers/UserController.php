@@ -1406,11 +1406,11 @@ class UserController extends Controller
         $sesson_data = $request->session()->all();
         if (!empty($session_data['user_id'])) {
             $code = $request->input('code');
-            $token_request_body = array(
+            $token_request_body = [
                 'client_secret' => env('STRIPE_SECRET_KEY'),
                 'grant_type' => 'authorization_code',
                 'code' => $code,
-            );
+            ];
             $req = curl_init('https://connect.stripe.com/oauth/token');
             curl_setopt($req, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($req, CURLOPT_POST, true);

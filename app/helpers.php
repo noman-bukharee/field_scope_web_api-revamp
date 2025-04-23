@@ -107,7 +107,7 @@ function v($array,$title = ""){
 
 function getRawQuery($sql)
 {
-    $query = str_replace(array('?'), array('\'%s\''), $sql->toSql());
+    $query = str_replace(['?'], ['\'%s\''], $sql->toSql());
     $query = vsprintf($query, $sql->getBindings());
     return $query;
 }
